@@ -11,3 +11,16 @@ more zeqr to be added later.
 
 
 ## Developed with 💓 in Flutter 😎.
+
+
+## Support me
+
+You can support me by:
+
+⭐️ this repo if you like it.
+
+Buy me a cup of coffee ☕️:
+
+<a href="https://www.buymeacoffee.com/ahmadj" target="_blank"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
+Thank you in advance 👍
