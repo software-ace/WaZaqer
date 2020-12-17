@@ -110,6 +110,7 @@ class ZeqrCard extends StatelessWidget {
             Text(
               zeqr.text,
               style: TextStyle(fontSize: 19, color: Colors.white),
+              textAlign: TextAlign.right,
             ),
             SizedBox(
               height: 10.0,
@@ -117,6 +118,7 @@ class ZeqrCard extends StatelessWidget {
             Text(
               'عدد المرات المتبقية: ${zeqr.count}'.toString(),
               style: TextStyle(fontSize: 15, color: Colors.yellow),
+              textAlign: TextAlign.right,
             ),
             SizedBox(
               height: 6.0,
