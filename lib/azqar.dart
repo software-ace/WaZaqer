@@ -15,7 +15,6 @@ class _AzqarState extends State<Azqar> {
     return DefaultTabController(
       length: cats.length,
       child: Scaffold(
-        backgroundColor: kSecondaryColor,
         appBar: AppBar(
           actions: [
             IconButton(
@@ -36,6 +35,7 @@ class _AzqarState extends State<Azqar> {
             }).toList(),
           ),
         ),
+        backgroundColor: kSecondaryColor,
         body: TabBarView(children: [
           ListView(children: [
             Column(
@@ -116,10 +116,14 @@ class ZeqrCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              zeqr.text,
-              style: TextStyle(fontSize: kMainTextSize, color: kMainTextColor),
-              textAlign: TextAlign.right,
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Text(
+                zeqr.text,
+                style:
+                    TextStyle(fontSize: kMainTextSize, color: kMainTextColor),
+                textAlign: TextAlign.right,
+              ),
             ),
             SizedBox(
               height: 10.0,

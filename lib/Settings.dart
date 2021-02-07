@@ -8,7 +8,7 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  double _currentFontSize = 15;
+  double _currentFontSize = 19;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,12 +34,13 @@ class _SettingsState extends State<Settings> {
                   value: _currentFontSize,
                   onChanged: (value) {
                     setState(() {
+                      print(value);
                       _currentFontSize = value;
                     });
                   },
                   min: 15,
-                  max: 22,
-                  divisions: 7,
+                  max: 25,
+                  divisions: 10,
                   // label: _currentFontSize.toString(),
                 ),
                 Text(_currentFontSize.toStringAsFixed(0))

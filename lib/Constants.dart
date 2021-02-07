@@ -6,4 +6,4 @@ Color kButtonColor = Colors.cyan[200];
 Color kMainTextColor = Colors.white;
 Color kCounterColor = Colors.yellow;
 Color kCardColor = Colors.blueGrey;
-const double kMainTextSize = 19.0;
+const double kMainTextSize = 18.0;
