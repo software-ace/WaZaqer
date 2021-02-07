@@ -1,3 +1,4 @@
+import 'package:azqar/Constants.dart';
 import 'package:azqar/Settings.dart';
 import 'package:flutter/material.dart';
 import 'azqarLists.dart';
@@ -14,7 +15,7 @@ class _AzqarState extends State<Azqar> {
     return DefaultTabController(
       length: cats.length,
       child: Scaffold(
-        backgroundColor: Colors.cyan[50],
+        backgroundColor: kSecondaryColor,
         appBar: AppBar(
           actions: [
             IconButton(
@@ -24,7 +25,7 @@ class _AzqarState extends State<Azqar> {
           ],
           title: Text('الأذكار'),
           centerTitle: true,
-          backgroundColor: Colors.cyan[600],
+          backgroundColor: kMainColor,
           elevation: 0.0,
           bottom: TabBar(
             isScrollable: true,
@@ -109,7 +110,7 @@ class ZeqrCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(10),
-      color: Colors.blueGrey,
+      color: kCardColor,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Column(
@@ -117,7 +118,7 @@ class ZeqrCard extends StatelessWidget {
           children: [
             Text(
               zeqr.text,
-              style: TextStyle(fontSize: 19, color: Colors.white),
+              style: TextStyle(fontSize: kMainTextSize, color: kMainTextColor),
               textAlign: TextAlign.right,
             ),
             SizedBox(
@@ -125,16 +126,21 @@ class ZeqrCard extends StatelessWidget {
             ),
             Text(
               'عدد المرات المتبقية: ${zeqr.count}'.toString(),
-              style: TextStyle(fontSize: 15, color: Colors.yellow),
+              style: TextStyle(fontSize: 15, color: kCounterColor),
               textAlign: TextAlign.right,
             ),
             SizedBox(
               height: 6.0,
             ),
             RaisedButton(
-                color: Colors.cyan[200],
+                color: kButtonColor,
                 onPressed: reduce,
-                child: zeqr.count == 1 ? Text('اتممت') : Text('اتممت مرة'))
+                child: zeqr.count == 1
+                    ? Text(
+                        'اتممت',
+                        style: TextStyle(fontSize: 17),
+                      )
+                    : Text('اتممت مرة'))
           ],
         ),
       ),
