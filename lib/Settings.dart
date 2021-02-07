@@ -1,5 +1,6 @@
-import 'package:azqar/Constants.dart';
+import 'package:azqar/azqar.dart';
 import 'package:flutter/material.dart';
+import 'package:stacked_themes/stacked_themes.dart';
 
 class Settings extends StatefulWidget {
   static const String id = 'Settings';
@@ -9,49 +10,72 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings> {
   double _currentFontSize = 19;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('الاعدادات'),
-        backgroundColor: kMainColor,
+        backgroundColor: Theme.of(context).accentColor,
         centerTitle: true,
       ),
-      backgroundColor: kSecondaryColor,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'حجم الخط',
-                  style: TextStyle(),
-                  textAlign: TextAlign.right,
-                ),
-                Slider(
-                  value: _currentFontSize,
-                  onChanged: (value) {
-                    setState(() {
-                      print(value);
-                      _currentFontSize = value;
-                    });
-                  },
-                  min: 15,
-                  max: 25,
-                  divisions: 10,
-                  // label: _currentFontSize.toString(),
-                ),
-                Text(_currentFontSize.toStringAsFixed(0))
-              ],
-            ),
+      backgroundColor: Theme.of(context).backgroundColor,
+      body: Column(children: [
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
+          padding: const EdgeInsets.all(15.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                'حجم الخط',
+                style: TextStyle(),
+                textAlign: TextAlign.right,
+              ),
+              Slider(
+                value: _currentFontSize,
+                activeColor: Theme.of(context).accentColor,
+                onChanged: (value) {
+                  setState(() {
+                    _currentFontSize = value;
+                  });
+                },
+                min: 15,
+                max: 25,
+                divisions: 10,
+                // label: _currentFontSize.toString(),
+              ),
+              Text(_currentFontSize.toStringAsFixed(0))
+            ],
           ),
-          Row(
-            children: [],
-          )
-        ],
-      ),
+        ),
+        RaisedButton(
+            child: Text('Theme 1'),
+            elevation: 3.0,
+            color: Colors.cyan[600],
+            onPressed: () {
+              getThemeManager(context).selectThemeAtIndex(0);
+            }),
+        RaisedButton(
+            child: Text('Theme 2'),
+            elevation: 3.0,
+            color: Colors.red[600],
+            onPressed: () {
+              getThemeManager(context).selectThemeAtIndex(1);
+            }),
+        SizedBox(
+          height: 200,
+        ),
+        Positioned(
+            bottom: 0,
+            child: RaisedButton(
+              child: Text('حفظ الاعدادات'),
+              onPressed: () {
+                Navigator.popAndPushNamed(context, Azqar.id,
+                    arguments: _currentFontSize);
+              },
+            ))
+      ]),
     );
   }
 }

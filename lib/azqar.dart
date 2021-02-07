@@ -5,6 +5,7 @@ import 'azqarLists.dart';
 
 class Azqar extends StatefulWidget {
   static const String id = 'Azqar';
+
   @override
   _AzqarState createState() => _AzqarState();
 }
@@ -12,6 +13,7 @@ class Azqar extends StatefulWidget {
 class _AzqarState extends State<Azqar> {
   @override
   Widget build(BuildContext context) {
+    double fontSize = ModalRoute.of(context).settings.arguments;
     return DefaultTabController(
       length: cats.length,
       child: Scaffold(
@@ -24,7 +26,7 @@ class _AzqarState extends State<Azqar> {
           ],
           title: Text('الأذكار'),
           centerTitle: true,
-          backgroundColor: kMainColor,
+          backgroundColor: Theme.of(context).accentColor,
           elevation: 0.0,
           bottom: TabBar(
             isScrollable: true,
@@ -35,12 +37,13 @@ class _AzqarState extends State<Azqar> {
             }).toList(),
           ),
         ),
-        backgroundColor: kSecondaryColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: TabBarView(children: [
           ListView(children: [
             Column(
               children: morningAzqarList
                   .map((zeqr) => ZeqrCard(
+                        fontSize: fontSize,
                         zeqr: zeqr,
                         reduce: () {
                           setState(() {
@@ -58,6 +61,7 @@ class _AzqarState extends State<Azqar> {
             Column(
               children: nightAzqarList
                   .map((zeqr) => ZeqrCard(
+                        fontSize: fontSize,
                         zeqr: zeqr,
                         reduce: () {
                           setState(() {
@@ -75,6 +79,7 @@ class _AzqarState extends State<Azqar> {
             Column(
               children: sleepAzqarList
                   .map((zeqr) => ZeqrCard(
+                        fontSize: fontSize,
                         zeqr: zeqr,
                         reduce: () {
                           setState(() {
@@ -101,16 +106,21 @@ class Zeqr {
   Zeqr({this.text, this.count});
 }
 
-class ZeqrCard extends StatelessWidget {
+class ZeqrCard extends StatefulWidget {
   final Zeqr zeqr;
   final Function reduce;
-  ZeqrCard({this.zeqr, this.reduce});
+  final double fontSize;
+  ZeqrCard({this.zeqr, this.reduce, this.fontSize});
+  @override
+  _ZeqrCardState createState() => _ZeqrCardState();
+}
 
+class _ZeqrCardState extends State<ZeqrCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(10),
-      color: kCardColor,
+      color: Theme.of(context).cardColor,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: Column(
@@ -119,9 +129,9 @@ class ZeqrCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Text(
-                zeqr.text,
+                widget.zeqr.text,
                 style:
-                    TextStyle(fontSize: kMainTextSize, color: kMainTextColor),
+                    TextStyle(fontSize: widget.fontSize, color: kMainTextColor),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -129,7 +139,7 @@ class ZeqrCard extends StatelessWidget {
               height: 10.0,
             ),
             Text(
-              'عدد المرات المتبقية: ${zeqr.count}'.toString(),
+              'عدد المرات المتبقية: ${widget.zeqr.count}'.toString(),
               style: TextStyle(fontSize: 15, color: kCounterColor),
               textAlign: TextAlign.right,
             ),
@@ -137,9 +147,9 @@ class ZeqrCard extends StatelessWidget {
               height: 6.0,
             ),
             RaisedButton(
-                color: kButtonColor,
-                onPressed: reduce,
-                child: zeqr.count == 1
+                color: Theme.of(context).buttonColor,
+                onPressed: widget.reduce,
+                child: widget.zeqr.count == 1
                     ? Text(
                         'اتممت',
                         style: TextStyle(fontSize: 17),

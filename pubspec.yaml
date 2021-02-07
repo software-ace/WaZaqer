@@ -1,9 +1,9 @@
 name: azqar
 description: Flutter app to read Azqar.
 
-publish_to: 'none' 
+publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -11,8 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^0.1.3
+  shared_preferences: 
+  stacked_themes:
 
 dev_dependencies:
   flutter_test:

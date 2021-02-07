@@ -1,9 +1,24 @@
 import 'package:flutter/material.dart';
 
-Color kMainColor = Colors.cyan[600];
-Color kSecondaryColor = Colors.cyan[50];
-Color kButtonColor = Colors.cyan[200];
+//defaults
+
 Color kMainTextColor = Colors.white;
 Color kCounterColor = Colors.yellow;
-Color kCardColor = Colors.blueGrey;
 const double kMainTextSize = 18.0;
+
+List<ThemeData> getThemes() {
+  return [
+    ThemeData(
+      accentColor: Colors.cyan[600],
+      backgroundColor: Colors.cyan[50],
+      buttonColor: Colors.cyan[200],
+      cardColor: Colors.blueGrey,
+    ),
+    ThemeData(
+      accentColor: Colors.red[600],
+      backgroundColor: Colors.red[50],
+      buttonColor: Colors.red[200],
+      cardColor: Colors.blueGrey,
+    ),
+  ];
+}
