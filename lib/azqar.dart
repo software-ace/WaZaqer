@@ -1,7 +1,9 @@
+import 'package:azqar/Settings.dart';
 import 'package:flutter/material.dart';
 import 'azqarLists.dart';
 
 class Azqar extends StatefulWidget {
+  static const String id = 'Azqar';
   @override
   _AzqarState createState() => _AzqarState();
 }
@@ -14,6 +16,12 @@ class _AzqarState extends State<Azqar> {
       child: Scaffold(
         backgroundColor: Colors.cyan[50],
         appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.pushNamed(context, Settings.id),
+              icon: Icon(Icons.settings),
+            )
+          ],
           title: Text('الأذكار'),
           centerTitle: true,
           backgroundColor: Colors.cyan[600],
@@ -126,7 +134,7 @@ class ZeqrCard extends StatelessWidget {
             RaisedButton(
                 color: Colors.cyan[200],
                 onPressed: reduce,
-                child: Text('اتممت مرة'))
+                child: zeqr.count == 1 ? Text('اتممت') : Text('اتممت مرة'))
           ],
         ),
       ),
