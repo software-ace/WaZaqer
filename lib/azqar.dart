@@ -2,6 +2,7 @@ import 'package:azqar/Constants.dart';
 import 'package:azqar/Settings.dart';
 import 'package:flutter/material.dart';
 import 'azqarLists.dart';
+import 'package:share/share.dart';
 
 class Azqar extends StatefulWidget {
   static const String id = 'Azqar';
@@ -146,15 +147,29 @@ class _ZeqrCardState extends State<ZeqrCard> {
             SizedBox(
               height: 6.0,
             ),
-            RaisedButton(
-                color: Theme.of(context).buttonColor,
-                onPressed: widget.reduce,
-                child: widget.zeqr.count == 1
-                    ? Text(
-                        'اتممت',
-                        style: TextStyle(fontSize: 17),
-                      )
-                    : Text('اتممت مرة'))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Builder(builder: (BuildContext context) {
+                  return IconButton(
+                      icon: Icon(Icons.share),
+                      tooltip: 'Share',
+                      color: Theme.of(context).buttonColor,
+                      onPressed: () {
+                        Share.share(widget.zeqr.text);
+                      });
+                }),
+                RaisedButton(
+                    color: Theme.of(context).buttonColor,
+                    onPressed: widget.reduce,
+                    child: widget.zeqr.count == 1
+                        ? Text(
+                            'اتممت',
+                            style: TextStyle(fontSize: 17),
+                          )
+                        : Text('اتممت مرة')),
+              ],
+            ),
           ],
         ),
       ),

@@ -12,8 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.3
-  shared_preferences: 
-  stacked_themes:
+  share: ^0.6.5+4
+  shared_preferences: null
+  stacked_themes: null
 
 dev_dependencies:
   flutter_test:
