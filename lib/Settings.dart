@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_themes/stacked_themes.dart';
 
+import 'azqar.dart';
+
 class Settings extends StatefulWidget {
   static const String id = 'Settings';
   @override

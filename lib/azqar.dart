@@ -1,6 +1,6 @@
-import 'package:azqar/Constants.dart';
-import 'package:azqar/Settings.dart';
 import 'package:flutter/material.dart';
+import 'Constants.dart';
+import 'Settings.dart';
 import 'azqarLists.dart';
 import 'package:share/share.dart';
 
