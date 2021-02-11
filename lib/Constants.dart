@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+const kAzqar = 'azqarBox';
 //defaults
 
 Color kMainTextColor = Colors.white;
@@ -18,6 +19,12 @@ List<ThemeData> getThemes() {
       accentColor: Colors.red[600],
       backgroundColor: Colors.red[50],
       buttonColor: Colors.red[200],
+      cardColor: Colors.blueGrey,
+    ),
+    ThemeData(
+      accentColor: Colors.purple[600],
+      backgroundColor: Colors.purple[50],
+      buttonColor: Colors.purple[200],
       cardColor: Colors.blueGrey,
     ),
   ];

@@ -1,10 +1,13 @@
-import 'package:azqar/Constants.dart';
 import 'package:flutter/material.dart';
 import 'Settings.dart';
 import 'azqar.dart';
 import 'package:stacked_themes/stacked_themes.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 Future main() async {
+  final appDocDirectory =
+      await path_provider.getApplicationDocumentsDirectory();
+
   await ThemeManager.initialise();
   runApp(ThemeBuilder(
     themes: getThemes(),
@@ -15,7 +18,7 @@ Future main() async {
         Azqar.id: (context) => Azqar(),
         Settings.id: (context) => Settings()
       },
-      title: 'Azqar',
+      title: 'WaZaqer',
       debugShowCheckedModeBanner: false,
     ),
   ));

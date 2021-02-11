@@ -1,4 +1,3 @@
-import 'package:azqar/azqar.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_themes/stacked_themes.dart';
 
@@ -22,7 +21,7 @@ class _SettingsState extends State<Settings> {
       backgroundColor: Theme.of(context).backgroundColor,
       body: Column(children: [
         Container(
-          margin: EdgeInsets.fromLTRB(0, 20, 0, 20),
+          margin: EdgeInsets.fromLTRB(20, 20, 20, 20),
           padding: const EdgeInsets.all(15.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,32 +48,46 @@ class _SettingsState extends State<Settings> {
             ],
           ),
         ),
-        RaisedButton(
-            child: Text('Theme 1'),
-            elevation: 3.0,
-            color: Colors.cyan[600],
-            onPressed: () {
-              getThemeManager(context).selectThemeAtIndex(0);
-            }),
-        RaisedButton(
-            child: Text('Theme 2'),
-            elevation: 3.0,
-            color: Colors.red[600],
-            onPressed: () {
-              getThemeManager(context).selectThemeAtIndex(1);
-            }),
-        SizedBox(
-          height: 200,
+        Container(
+          margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          padding: const EdgeInsets.all(15.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              RaisedButton(
+                  child: Text('Theme 1'),
+                  elevation: 3.0,
+                  color: Colors.cyan[600],
+                  onPressed: () {
+                    getThemeManager(context).selectThemeAtIndex(0);
+                  }),
+              RaisedButton(
+                  child: Text('Theme 2'),
+                  elevation: 3.0,
+                  color: Colors.red[600],
+                  onPressed: () {
+                    getThemeManager(context).selectThemeAtIndex(1);
+                  }),
+              RaisedButton(
+                  child: Text('Theme 3'),
+                  elevation: 3.0,
+                  color: Colors.purple[600],
+                  onPressed: () {
+                    getThemeManager(context).selectThemeAtIndex(2);
+                  }),
+            ],
+          ),
         ),
-        Positioned(
-            bottom: 0,
-            child: RaisedButton(
-              child: Text('حفظ الاعدادات'),
-              onPressed: () {
-                Navigator.popAndPushNamed(context, Azqar.id,
-                    arguments: _currentFontSize);
-              },
-            ))
+        SizedBox(
+          height: 100,
+        ),
+        RaisedButton(
+          child: Text('حفظ الاعدادات'),
+          onPressed: () {
+            Navigator.popAndPushNamed(context, Azqar.id,
+                arguments: _currentFontSize);
+          },
+        )
       ]),
     );
   }

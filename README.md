@@ -1,4 +1,4 @@
-# azqar
+# WaZaqer
 
 Flutter app to read Azqar.
 

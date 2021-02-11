@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'azqarLists.dart';
 import 'package:share/share.dart';
 
+import 'model/zeqr.dart';
+
 class Azqar extends StatefulWidget {
   static const String id = 'Azqar';
-
   @override
   _AzqarState createState() => _AzqarState();
 }
@@ -14,97 +15,40 @@ class Azqar extends StatefulWidget {
 class _AzqarState extends State<Azqar> {
   @override
   Widget build(BuildContext context) {
-    double fontSize = ModalRoute.of(context).settings.arguments;
-    return DefaultTabController(
-      length: cats.length,
-      child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.pushNamed(context, Settings.id),
-              icon: Icon(Icons.settings),
-            )
-          ],
-          title: Text('الأذكار'),
-          centerTitle: true,
-          backgroundColor: Theme.of(context).accentColor,
-          elevation: 0.0,
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: cats.map<Widget>((Cats cat) {
-              return Tab(
-                text: cat.title,
-              );
-            }).toList(),
-          ),
-        ),
-        backgroundColor: Theme.of(context).backgroundColor,
-        body: TabBarView(children: [
-          ListView(children: [
-            Column(
-              children: morningAzqarList
-                  .map((zeqr) => ZeqrCard(
-                        fontSize: fontSize,
-                        zeqr: zeqr,
-                        reduce: () {
-                          setState(() {
-                            zeqr.count -= 1;
-                            if (zeqr.count == 0) {
-                              morningAzqarList.remove(zeqr);
-                            }
-                          });
-                        },
-                      ))
-                  .toList(),
-            ),
-          ]),
-          ListView(children: [
-            Column(
-              children: nightAzqarList
-                  .map((zeqr) => ZeqrCard(
-                        fontSize: fontSize,
-                        zeqr: zeqr,
-                        reduce: () {
-                          setState(() {
-                            zeqr.count -= 1;
-                            if (zeqr.count == 0) {
-                              nightAzqarList.remove(zeqr);
-                            }
-                          });
-                        },
-                      ))
-                  .toList(),
-            ),
-          ]),
-          ListView(children: [
-            Column(
-              children: sleepAzqarList
-                  .map((zeqr) => ZeqrCard(
-                        fontSize: fontSize,
-                        zeqr: zeqr,
-                        reduce: () {
-                          setState(() {
-                            zeqr.count -= 1;
-                            if (zeqr.count == 0) {
-                              sleepAzqarList.remove(zeqr);
-                            }
-                          });
-                        },
-                      ))
-                  .toList(),
-            ),
-          ]),
-        ]),
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, Settings.id),
+            icon: Icon(Icons.settings),
+          )
+        ],
+        title: Text('الأذكار'),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).accentColor,
+        elevation: 0.0,
       ),
+      backgroundColor: Theme.of(context).backgroundColor,
+      body: ListView(children: [
+        Column(
+          children: azqarList
+              .map((zeqr) => ZeqrCard(
+                    fontSize: 16,
+                    zeqr: zeqr,
+                    reduce: () {
+                      setState(() {
+                        zeqr.count -= 1;
+                        if (zeqr.count == 0) {
+                          azqarList.remove(zeqr);
+                        }
+                      });
+                    },
+                  ))
+              .toList(),
+        ),
+      ]),
     );
   }
-}
-
-class Zeqr {
-  String text;
-  int count;
-
-  Zeqr({this.text, this.count});
 }
 
 class ZeqrCard extends StatefulWidget {
@@ -150,6 +94,13 @@ class _ZeqrCardState extends State<ZeqrCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                IconButton(
+                    icon: widget.zeqr.isFavorite
+                        ? Icon(Icons.favorite)
+                        : Icon(Icons.favorite_border),
+                    tooltip: 'Favorite',
+                    color: Theme.of(context).buttonColor,
+                    onPressed: () {}),
                 Builder(builder: (BuildContext context) {
                   return IconButton(
                       icon: Icon(Icons.share),
