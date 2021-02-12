@@ -8,9 +8,10 @@ class ZeqrType {
 List<ZeqrType> zeqrTypes = [
   ZeqrType('أذكار الصباح'),
   ZeqrType('أذكار المساء'),
-  ZeqrType('أذكار النوم')
+  ZeqrType('أذكار النوم'),
+  ZeqrType('الأذكار المفضلة')
 ];
-
+List<Zeqr> favs = [];
 List<Zeqr> azqarList = [
   Zeqr(
       text:

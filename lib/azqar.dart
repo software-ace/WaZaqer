@@ -15,38 +15,153 @@ class Azqar extends StatefulWidget {
 class _AzqarState extends State<Azqar> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pushNamed(context, Settings.id),
-            icon: Icon(Icons.settings),
-          )
-        ],
-        title: Text('الأذكار'),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).accentColor,
-        elevation: 0.0,
-      ),
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: ListView(children: [
-        Column(
-          children: azqarList
-              .map((zeqr) => ZeqrCard(
-                    fontSize: 16,
-                    zeqr: zeqr,
-                    reduce: () {
-                      setState(() {
-                        zeqr.count -= 1;
-                        if (zeqr.count == 0) {
-                          azqarList.remove(zeqr);
-                        }
-                      });
-                    },
-                  ))
-              .toList(),
+    return DefaultTabController(
+      length: zeqrTypes.length,
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () => Navigator.pushNamed(context, Settings.id),
+              icon: Icon(Icons.settings),
+            )
+          ],
+          title: Text('الأذكار'),
+          centerTitle: true,
+          backgroundColor: Theme.of(context).accentColor,
+          elevation: 0.0,
+          bottom: TabBar(
+            isScrollable: true,
+            tabs: zeqrTypes.map<Widget>((ZeqrType zeqrType) {
+              return Tab(
+                text: zeqrType.title,
+              );
+            }).toList(),
+          ),
         ),
-      ]),
+        backgroundColor: Theme.of(context).backgroundColor,
+        body: TabBarView(children: [
+          ListView(
+            children: azqarList
+                .where((element) => element.zeqrType == 'morning')
+                .map((zeqr) => ZeqrCard(
+                      fontSize: 16,
+                      zeqr: zeqr,
+                      reduce: () {
+                        setState(() {
+                          zeqr.count -= 1;
+                          if (zeqr.count == 0) {
+                            azqarList.remove(zeqr);
+                          }
+                        });
+                      },
+                      fav: () {
+                        setState(() {
+                          if (zeqr.isFavorite == false) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.add(zeqr);
+                            print('add');
+                          } else if (zeqr.isFavorite == true) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.remove(zeqr);
+                            print('del');
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+          ListView(
+            children: azqarList
+                .where((element) => element.zeqrType == 'night')
+                .map((zeqr) => ZeqrCard(
+                      fontSize: 16,
+                      zeqr: zeqr,
+                      reduce: () {
+                        setState(() {
+                          zeqr.count -= 1;
+                          if (zeqr.count == 0) {
+                            azqarList.remove(zeqr);
+                          }
+                        });
+                      },
+                      fav: () {
+                        setState(() {
+                          if (zeqr.isFavorite == false) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.add(zeqr);
+                            print('add');
+                          } else if (zeqr.isFavorite == true) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.remove(zeqr);
+                            print('del');
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+          ListView(
+            children: azqarList
+                .where((element) => element.zeqrType == 'sleep')
+                .map((zeqr) => ZeqrCard(
+                      fontSize: 16,
+                      zeqr: zeqr,
+                      reduce: () {
+                        setState(() {
+                          zeqr.count -= 1;
+                          if (zeqr.count == 0) {
+                            azqarList.remove(zeqr);
+                          }
+                        });
+                      },
+                      fav: () {
+                        setState(() {
+                          if (zeqr.isFavorite == false) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.add(zeqr);
+                            print('add');
+                          } else if (zeqr.isFavorite == true) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.remove(zeqr);
+                            print('del');
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+          ListView(
+            children: azqarList
+                .where((element) => element.isFavorite == true)
+                .map((zeqr) => ZeqrCard(
+                      fontSize: 16,
+                      zeqr: zeqr,
+                      reduce: () {
+                        setState(() {
+                          zeqr.count -= 1;
+                          if (zeqr.count == 0) {
+                            azqarList.remove(zeqr);
+                          }
+                        });
+                      },
+                      fav: () {
+                        setState(() {
+                          if (zeqr.isFavorite == false) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.add(zeqr);
+                            print('add');
+                          } else if (zeqr.isFavorite == true) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.remove(zeqr);
+                            print('del');
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+        ]),
+      ),
     );
   }
 }
@@ -54,8 +169,9 @@ class _AzqarState extends State<Azqar> {
 class ZeqrCard extends StatefulWidget {
   final Zeqr zeqr;
   final Function reduce;
+  final Function fav;
   final double fontSize;
-  ZeqrCard({this.zeqr, this.reduce, this.fontSize});
+  ZeqrCard({this.zeqr, this.reduce, this.fontSize, this.fav});
   @override
   _ZeqrCardState createState() => _ZeqrCardState();
 }
@@ -100,7 +216,9 @@ class _ZeqrCardState extends State<ZeqrCard> {
                         : Icon(Icons.favorite_border),
                     tooltip: 'Favorite',
                     color: Theme.of(context).buttonColor,
-                    onPressed: () {}),
+                    onPressed: () {
+                      widget.fav();
+                    }),
                 Builder(builder: (BuildContext context) {
                   return IconButton(
                       icon: Icon(Icons.share),
