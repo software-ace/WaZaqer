@@ -27,5 +27,17 @@ List<ThemeData> getThemes() {
       buttonColor: Colors.purple[200],
       cardColor: Colors.blueGrey,
     ),
+    ThemeData(
+      accentColor: Colors.amber[600],
+      backgroundColor: Colors.amber[50],
+      buttonColor: Colors.amber[200],
+      cardColor: Colors.blueGrey,
+    ),
+    ThemeData(
+      accentColor: Colors.green[600],
+      backgroundColor: Colors.green[50],
+      buttonColor: Colors.green[200],
+      cardColor: Colors.blueGrey,
+    ),
   ];
 }

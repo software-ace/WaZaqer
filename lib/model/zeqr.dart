@@ -3,5 +3,9 @@ class Zeqr {
   int count;
   bool isFavorite;
   String zeqrType;
-  Zeqr({this.text, this.count, this.isFavorite, this.zeqrType});
+  Zeqr(
+      {required this.text,
+      required this.count,
+      required this.isFavorite,
+      required this.zeqrType});
 }

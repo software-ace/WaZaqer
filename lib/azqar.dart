@@ -15,6 +15,9 @@ class Azqar extends StatefulWidget {
 class _AzqarState extends State<Azqar> {
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    double _fontSize = _width * 0.05;
+
     return DefaultTabController(
       length: zeqrTypes.length,
       child: Scaffold(
@@ -44,7 +47,7 @@ class _AzqarState extends State<Azqar> {
             children: azqarList
                 .where((element) => element.zeqrType == 'morning')
                 .map((zeqr) => ZeqrCard(
-                      fontSize: 16,
+                      fontSize: _fontSize,
                       zeqr: zeqr,
                       reduce: () {
                         setState(() {
@@ -74,7 +77,7 @@ class _AzqarState extends State<Azqar> {
             children: azqarList
                 .where((element) => element.zeqrType == 'night')
                 .map((zeqr) => ZeqrCard(
-                      fontSize: 16,
+                      fontSize: _fontSize,
                       zeqr: zeqr,
                       reduce: () {
                         setState(() {
@@ -104,7 +107,7 @@ class _AzqarState extends State<Azqar> {
             children: azqarList
                 .where((element) => element.zeqrType == 'sleep')
                 .map((zeqr) => ZeqrCard(
-                      fontSize: 16,
+                      fontSize: _fontSize,
                       zeqr: zeqr,
                       reduce: () {
                         setState(() {
@@ -134,7 +137,7 @@ class _AzqarState extends State<Azqar> {
             children: azqarList
                 .where((element) => element.isFavorite == true)
                 .map((zeqr) => ZeqrCard(
-                      fontSize: 16,
+                      fontSize: _fontSize,
                       zeqr: zeqr,
                       reduce: () {
                         setState(() {
@@ -168,10 +171,14 @@ class _AzqarState extends State<Azqar> {
 
 class ZeqrCard extends StatefulWidget {
   final Zeqr zeqr;
-  final Function reduce;
+  final VoidCallback reduce;
   final Function fav;
   final double fontSize;
-  ZeqrCard({this.zeqr, this.reduce, this.fontSize, this.fav});
+  ZeqrCard(
+      {required this.zeqr,
+      required this.reduce,
+      required this.fontSize,
+      required this.fav});
   @override
   _ZeqrCardState createState() => _ZeqrCardState();
 }
@@ -228,8 +235,10 @@ class _ZeqrCardState extends State<ZeqrCard> {
                         Share.share(widget.zeqr.text);
                       });
                 }),
-                RaisedButton(
-                    color: Theme.of(context).buttonColor,
+                ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).buttonColor)),
                     onPressed: widget.reduce,
                     child: widget.zeqr.count == 1
                         ? Text(
