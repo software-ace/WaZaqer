@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-const kAzqar = 'azqarBox';
 //defaults
 
 Color kMainTextColor = Colors.white;
 Color kCounterColor = Colors.yellow;
-const double kMainTextSize = 18.0;
 
 List<ThemeData> getThemes() {
   return [

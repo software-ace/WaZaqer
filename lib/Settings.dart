@@ -41,7 +41,10 @@ class _SettingsState extends State<Settings> {
                 SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () => getThemeManager(context).selectThemeAtIndex(index),
+                onTap: () {
+                  getThemeManager(context).selectThemeAtIndex(index);
+                  Navigator.pop(context);
+                },
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                   color: themeColors[index],
