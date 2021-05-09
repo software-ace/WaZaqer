@@ -45,6 +45,36 @@ class _AzqarState extends State<Azqar> {
         body: TabBarView(children: [
           ListView(
             children: azqarList
+                .where((element) => element.zeqrType == 'afterprayer')
+                .map((zeqr) => ZeqrCard(
+                      fontSize: _fontSize,
+                      zeqr: zeqr,
+                      reduce: () {
+                        setState(() {
+                          zeqr.count -= 1;
+                          if (zeqr.count == 0) {
+                            azqarList.remove(zeqr);
+                          }
+                        });
+                      },
+                      fav: () {
+                        setState(() {
+                          if (zeqr.isFavorite == false) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.add(zeqr);
+                            print('add');
+                          } else if (zeqr.isFavorite == true) {
+                            zeqr.isFavorite = !zeqr.isFavorite;
+                            favs.remove(zeqr);
+                            print('del');
+                          }
+                        });
+                      },
+                    ))
+                .toList(),
+          ),
+          ListView(
+            children: azqarList
                 .where((element) => element.zeqrType == 'morning')
                 .map((zeqr) => ZeqrCard(
                       fontSize: _fontSize,
