@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'Constants.dart';
-import 'Settings.dart';
 import 'azqarLists.dart';
 import 'package:share/share.dart';
 
@@ -22,15 +20,8 @@ class _AzqarState extends State<Azqar> {
       length: zeqrTypes.length,
       child: Scaffold(
         appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.pushNamed(context, Settings.id),
-              icon: Icon(Icons.settings),
-            )
-          ],
           title: Text('الأذكار'),
           centerTitle: true,
-          backgroundColor: Theme.of(context).accentColor,
           elevation: 0.0,
           bottom: TabBar(
             isScrollable: true,
@@ -57,19 +48,6 @@ class _AzqarState extends State<Azqar> {
                           }
                         });
                       },
-                      fav: () {
-                        setState(() {
-                          if (zeqr.isFavorite == false) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.add(zeqr);
-                            print('add');
-                          } else if (zeqr.isFavorite == true) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.remove(zeqr);
-                            print('del');
-                          }
-                        });
-                      },
                     ))
                 .toList(),
           ),
@@ -84,19 +62,6 @@ class _AzqarState extends State<Azqar> {
                           zeqr.count -= 1;
                           if (zeqr.count == 0) {
                             azqarList.remove(zeqr);
-                          }
-                        });
-                      },
-                      fav: () {
-                        setState(() {
-                          if (zeqr.isFavorite == false) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.add(zeqr);
-                            print('add');
-                          } else if (zeqr.isFavorite == true) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.remove(zeqr);
-                            print('del');
                           }
                         });
                       },
@@ -117,19 +82,6 @@ class _AzqarState extends State<Azqar> {
                           }
                         });
                       },
-                      fav: () {
-                        setState(() {
-                          if (zeqr.isFavorite == false) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.add(zeqr);
-                            print('add');
-                          } else if (zeqr.isFavorite == true) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.remove(zeqr);
-                            print('del');
-                          }
-                        });
-                      },
                     ))
                 .toList(),
           ),
@@ -147,49 +99,6 @@ class _AzqarState extends State<Azqar> {
                           }
                         });
                       },
-                      fav: () {
-                        setState(() {
-                          if (zeqr.isFavorite == false) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.add(zeqr);
-                            print('add');
-                          } else if (zeqr.isFavorite == true) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.remove(zeqr);
-                            print('del');
-                          }
-                        });
-                      },
-                    ))
-                .toList(),
-          ),
-          ListView(
-            children: azqarList
-                .where((element) => element.isFavorite == true)
-                .map((zeqr) => ZeqrCard(
-                      fontSize: _fontSize,
-                      zeqr: zeqr,
-                      reduce: () {
-                        setState(() {
-                          zeqr.count -= 1;
-                          if (zeqr.count == 0) {
-                            azqarList.remove(zeqr);
-                          }
-                        });
-                      },
-                      fav: () {
-                        setState(() {
-                          if (zeqr.isFavorite == false) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.add(zeqr);
-                            print('add');
-                          } else if (zeqr.isFavorite == true) {
-                            zeqr.isFavorite = !zeqr.isFavorite;
-                            favs.remove(zeqr);
-                            print('del');
-                          }
-                        });
-                      },
                     ))
                 .toList(),
           ),
@@ -202,13 +111,13 @@ class _AzqarState extends State<Azqar> {
 class ZeqrCard extends StatefulWidget {
   final Zeqr zeqr;
   final VoidCallback reduce;
-  final Function fav;
+
   final double fontSize;
-  ZeqrCard(
-      {required this.zeqr,
-      required this.reduce,
-      required this.fontSize,
-      required this.fav});
+  ZeqrCard({
+    required this.zeqr,
+    required this.reduce,
+    required this.fontSize,
+  });
   @override
   _ZeqrCardState createState() => _ZeqrCardState();
 }
@@ -228,8 +137,7 @@ class _ZeqrCardState extends State<ZeqrCard> {
               padding: const EdgeInsets.all(18.0),
               child: Text(
                 widget.zeqr.text,
-                style:
-                    TextStyle(fontSize: widget.fontSize, color: kMainTextColor),
+                style: TextStyle(fontSize: widget.fontSize),
                 textAlign: TextAlign.right,
               ),
             ),
@@ -238,7 +146,7 @@ class _ZeqrCardState extends State<ZeqrCard> {
             ),
             Text(
               'عدد المرات المتبقية: ${widget.zeqr.count}'.toString(),
-              style: TextStyle(fontSize: 15, color: kCounterColor),
+              style: TextStyle(fontSize: 15),
               textAlign: TextAlign.right,
             ),
             SizedBox(
@@ -247,28 +155,15 @@ class _ZeqrCardState extends State<ZeqrCard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                    icon: widget.zeqr.isFavorite
-                        ? Icon(Icons.favorite)
-                        : Icon(Icons.favorite_border),
-                    tooltip: 'Favorite',
-                    color: Theme.of(context).buttonColor,
-                    onPressed: () {
-                      widget.fav();
-                    }),
                 Builder(builder: (BuildContext context) {
                   return IconButton(
                       icon: Icon(Icons.share),
                       tooltip: 'Share',
-                      color: Theme.of(context).buttonColor,
                       onPressed: () {
                         Share.share(widget.zeqr.text);
                       });
                 }),
                 ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).buttonColor)),
                     onPressed: widget.reduce,
                     child: widget.zeqr.count == 1
                         ? Text(
