@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'adhkar.dart';
+import 'category.dart';
 import 'digits.dart';
 import 'header.dart';
 import 'hijri.dart';
@@ -46,12 +47,14 @@ class _HomePageState extends State<HomePage> {
   AdhkarData? _data;
   bool _salawatFav = false;
   bool _notifCard = true;
+  int _favCount = 0;
 
   @override
   void initState() {
     super.initState();
     _salawatFav = Store.b('salawatFav');
     _notifCard = !Store.b('notifGranted') && !Store.b('notifDismissed');
+    _favCount = Store.list('favourites').length;
     AdhkarData.load().then((d) => setState(() => _data = d));
   }
 
@@ -131,11 +134,29 @@ class _HomePageState extends State<HomePage> {
                                   crossAxisSpacing: 12,
                                   childAspectRatio: 1.35,
                                 ),
-                            itemCount: data.categories.length,
-                            itemBuilder: (context, i) => _CategoryTile(
-                              category: data.categories[i],
-                              arabic: arabic,
-                            ),
+                            itemCount: data.categories.length + 1,
+                            itemBuilder: (context, i) => i == 0
+                                ? _FavTile(
+                                    count: _favCount,
+                                    arabic: arabic,
+                                    onTap: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CategoryPage(
+                                            data: data,
+                                          ),
+                                        ),
+                                      );
+                                      setState(() => _favCount =
+                                          Store.list('favourites').length);
+                                    },
+                                  )
+                                : _CategoryTile(
+                                    category: data.categories[i - 1],
+                                    data: data,
+                                    arabic: arabic,
+                                  ),
                           );
                         },
                       ),
@@ -317,6 +338,53 @@ class _SalawatCard extends StatelessWidget {
   }
 }
 
+/// Grid tile opening the favourites screen (CategoryPage with no category).
+class _FavTile extends StatelessWidget {
+  const _FavTile({
+    required this.count,
+    required this.arabic,
+    required this.onTap,
+  });
+
+  final int count;
+  final bool arabic;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      child: InkWell(
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.favorite, size: 22, color: scheme.primary),
+              ),
+              const Spacer(),
+              Text('المفضلة', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                count == 0 ? '—' : adhkarCountLabel(count, arabicDigits: arabic),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _NotifCard extends StatelessWidget {
   const _NotifCard({required this.onEnable, required this.onLater});
 
@@ -356,9 +424,14 @@ class _NotifCard extends StatelessWidget {
 }
 
 class _CategoryTile extends StatelessWidget {
-  const _CategoryTile({required this.category, required this.arabic});
+  const _CategoryTile({
+    required this.category,
+    required this.data,
+    required this.arabic,
+  });
 
   final AdhkarCategory category;
+  final AdhkarData data;
   final bool arabic;
 
   @override
@@ -371,7 +444,7 @@ class _CategoryTile extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => PlaceholderPage(title: category.title),
+            builder: (_) => CategoryPage(data: data, category: category),
           ),
         ),
         child: Stack(
