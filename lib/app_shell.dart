@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'header.dart';
-import 'hijri.dart';
-import 'store.dart';
+import 'home.dart';
 
 /// Bottom-nav shell with the five tabs. Active item gets the M3 pill.
 class AppShell extends StatefulWidget {
@@ -25,15 +24,11 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final arabic = Store.b('arabicDigits', def: true);
     return Scaffold(
       body: IndexedStack(
         index: _index,
         children: [
-          _TabPage(
-            title: 'وَذَكِر',
-            subtitle: formatHijri(DateTime.now(), arabicDigits: arabic),
-          ),
+          const HomePage(),
           for (final tab in _tabs.skip(1)) _TabPage(title: tab.$2),
         ],
       ),
@@ -55,16 +50,15 @@ class _AppShellState extends State<AppShell> {
 }
 
 class _TabPage extends StatelessWidget {
-  const _TabPage({required this.title, this.subtitle});
+  const _TabPage({required this.title});
 
   final String title;
-  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        WaZaqerHeader(title: title, subtitle: subtitle),
+        WaZaqerHeader(title: title),
         Expanded(
           child: Center(
             child: Text(

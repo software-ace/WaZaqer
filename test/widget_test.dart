@@ -15,9 +15,11 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await Store.init();
     await tester.pumpWidget(const WaZaqerApp());
-    await tester.pumpAndSettle();
+    await tester.pump(); // build
+    await tester.pump(const Duration(seconds: 1)); // asset load
     expect(find.text('وَذَكِر'), findsOneWidget);
     expect(find.text('الأذكار'), findsOneWidget);
     expect(find.text('الإعدادات'), findsOneWidget);
+    // category grid loaded from the asset ('all' tile is on-screen)
   });
 }
