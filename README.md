@@ -27,3 +27,12 @@ Fastlane metadata lives in `fastlane/metadata/android/` (English and Arabic), re
 ## License
 
 GPL-3.0. See [LICENSE](LICENSE).
+
+## Content attribution
+
+The adhkar texts (`assets/adhkar.json`) are supplications and remembrances
+transmitted in the public-domain hadith collections (Sahih al-Bukhari, Sahih
+Muslim, Sunan Abi Dawud, Jami` at-Tirmidhi, Sunan an-Nasa'i, Sunan ibn Majah,
+Musnad Ahmad and others), cited per dhikr in the `source` field. They are
+ancient religious texts with no copyright holder; only their compilation was
+taken from public datasets, and the category arrangement is this project's own.
