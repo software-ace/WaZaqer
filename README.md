@@ -36,3 +36,7 @@ Muslim, Sunan Abi Dawud, Jami` at-Tirmidhi, Sunan an-Nasa'i, Sunan ibn Majah,
 Musnad Ahmad and others), cited per dhikr in the `source` field. They are
 ancient religious texts with no copyright holder; only their compilation was
 taken from public datasets, and the category arrangement is this project's own.
+
+The bundled Arabic fonts are under the SIL Open Font License, each with its
+license text in `assets/fonts/OFL-*.txt`: Amiri, Scheherazade New, Noto Naskh
+Arabic, Cairo, Reem Kufi and Tajawal (source: google/fonts).
