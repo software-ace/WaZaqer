@@ -1,4 +1,4 @@
-# WaZaqer (وذكر)
+# WaZaqer (وَذَكِر)
 
 A free and open-source Flutter app for daily adhkar (remembrance): after prayer, morning, evening, and sleep.
 
