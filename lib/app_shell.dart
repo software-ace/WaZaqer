@@ -25,12 +25,14 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _index,
-        children: [
-          const HomePage(),
-          for (final tab in _tabs.skip(1)) _TabPage(title: tab.$2),
-        ],
+      body: MihrabPage(
+        child: IndexedStack(
+          index: _index,
+          children: [
+            const HomePage(),
+            for (final tab in _tabs.skip(1)) _TabPage(title: tab.$2),
+          ],
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
@@ -61,10 +63,7 @@ class _TabPage extends StatelessWidget {
         WaZaqerHeader(title: title),
         Expanded(
           child: Center(
-            child: Text(
-              'قريبًا',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+            child: Text('قريبًا', style: Theme.of(context).textTheme.bodyLarge),
           ),
         ),
       ],

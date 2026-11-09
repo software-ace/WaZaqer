@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Gradient with curved bottom edge; building block for all headers.
+/// Gradient band behind header content. The arch shape around it comes from
+/// [MihrabPage], which every shell page sits on.
 class HeaderGradient extends StatelessWidget {
   const HeaderGradient({super.key, required this.child, this.padding});
 
@@ -10,20 +11,17 @@ class HeaderGradient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return ClipPath(
-      clipper: const CurveClipper(),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [scheme.primary, scheme.tertiary],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [scheme.primary, scheme.tertiary],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
         ),
-        padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top)
-            .add(padding ?? const EdgeInsets.fromLTRB(8, 0, 8, 36)),
-        child: child,
       ),
+      padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top)
+          .add(padding ?? const EdgeInsets.fromLTRB(8, 0, 8, 36)),
+      child: child,
     );
   }
 }
@@ -85,32 +83,60 @@ class WaZaqerHeader extends StatelessWidget {
   }
 }
 
-/// Bottom edge cut into pointed (lancet) mosque arches.
-class CurveClipper extends CustomClipper<Path> {
-  const CurveClipper();
+/// Page background: full-bleed gradient with the content area cut out as a
+/// single giant pointed arch (mihrab) whose legs run to the bottom corners
+/// as border pillars. Content renders on top, inside the arch.
+class MihrabPage extends StatelessWidget {
+  const MihrabPage({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [scheme.primary, scheme.tertiary],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
+        ),
+        ClipPath(
+          clipper: const MihrabClipper(),
+          child: ColoredBox(color: scheme.surface),
+        ),
+        child,
+      ],
+    );
+  }
+}
+
+/// Interior of the single giant arch framing the page.
+class MihrabClipper extends CustomClipper<Path> {
+  const MihrabClipper();
 
   @override
   Path getClip(Size size) {
-    const overhang = 24.0; // flat part above the arches
-    final yb = size.height - overhang;
-    final n = (size.width / 160).round().clamp(3, 8);
-    final w = size.width / n;
-    final d = w * 0.38; // arch depth below the baseline
-    final e = w * 0.08; // control offset: makes the apex pointed
-    final path = Path()
-      ..moveTo(0, 0)
-      ..lineTo(0, yb);
-    for (var i = 0; i < n; i++) {
-      final x0 = i * w;
-      final xm = x0 + w / 2;
-      path
-        ..quadraticBezierTo(xm + e, yb, xm, yb + d)
-        ..quadraticBezierTo(xm - e, yb, x0 + w, yb);
-    }
-    path
-      ..lineTo(size.width, 0)
+    const f = 14.0; // pillar width
+    final cx = size.width / 2;
+    // apex just below the header band so the arch line stays visible
+    final y0 = (size.height * 0.32).clamp(270.0, 420.0).toDouble();
+    final cy = y0 + size.height * 0.20;
+    return Path()
+      ..moveTo(f, size.height)
+      ..quadraticBezierTo(cx - size.width * 0.40, cy, cx, y0)
+      ..quadraticBezierTo(
+        cx + size.width * 0.40,
+        cy,
+        size.width - f,
+        size.height,
+      )
       ..close();
-    return path;
   }
 
   @override
