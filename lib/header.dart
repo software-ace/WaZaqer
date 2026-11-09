@@ -64,16 +64,16 @@ class WaZaqerHeader extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: scheme.onPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: scheme.onPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: scheme.onPrimary.withValues(alpha: 0.8),
-                        ),
+                      color: scheme.onPrimary.withValues(alpha: 0.8),
+                    ),
                   ),
               ],
             ),
@@ -85,19 +85,34 @@ class WaZaqerHeader extends StatelessWidget {
   }
 }
 
+/// Bottom edge cut into pointed (lancet) mosque arches.
 class CurveClipper extends CustomClipper<Path> {
   const CurveClipper();
 
   @override
   Path getClip(Size size) {
-    return Path()
-      ..lineTo(0, size.height - 24)
-      ..quadraticBezierTo(
-          size.width / 2, size.height + 24, size.width, size.height - 24)
+    const overhang = 24.0; // flat part above the arches
+    final yb = size.height - overhang;
+    final n = (size.width / 160).round().clamp(3, 8);
+    final w = size.width / n;
+    final d = w * 0.38; // arch depth below the baseline
+    final e = w * 0.08; // control offset: makes the apex pointed
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(0, yb);
+    for (var i = 0; i < n; i++) {
+      final x0 = i * w;
+      final xm = x0 + w / 2;
+      path
+        ..quadraticBezierTo(xm + e, yb, xm, yb + d)
+        ..quadraticBezierTo(xm - e, yb, x0 + w, yb);
+    }
+    path
       ..lineTo(size.width, 0)
       ..close();
+    return path;
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  bool shouldReclip(covariant CustomClipper<Path> old) => false;
 }
