@@ -58,6 +58,12 @@ static void my_application_activate(GApplication* application) {
   fl_dart_project_set_dart_entrypoint_arguments(
       project, self->dart_entrypoint_arguments);
 
+  // window icon from the bundled asset (assets/icon/icon.png)
+  g_autofree gchar* icon_path = g_build_filename(
+      fl_dart_project_get_assets_path(project), "assets", "icon", "icon.png",
+      NULL);
+  gtk_window_set_default_icon_from_file(icon_path, nullptr);
+
   FlView* view = fl_view_new(project);
   GdkRGBA background_color;
   // Background defaults to black, override it here if necessary, e.g. #00000000
