@@ -20,19 +20,19 @@ String adhkarCountLabel(int n, {bool arabicDigits = true}) {
 }
 
 IconData categoryIcon(String name) => switch (name) {
-      'wb_sunny' => Icons.wb_sunny,
-      'home' => Icons.home,
-      'restaurant' => Icons.restaurant,
-      'sentiment_satisfied' => Icons.sentiment_satisfied,
-      'directions_car' => Icons.directions_car,
-      'mosque' => Icons.mosque,
-      'spa' => Icons.spa,
-      'flight' => Icons.flight,
-      'handshake' => Icons.handshake,
-      'water_drop' => Icons.water_drop,
-      'healing' => Icons.healing,
-      _ => Icons.apps,
-    };
+  'wb_sunny' => Icons.wb_sunny,
+  'home' => Icons.home,
+  'restaurant' => Icons.restaurant,
+  'sentiment_satisfied' => Icons.sentiment_satisfied,
+  'directions_car' => Icons.directions_car,
+  'mosque' => Icons.mosque,
+  'spa' => Icons.spa,
+  'flight' => Icons.flight,
+  'handshake' => Icons.handshake,
+  'water_drop' => Icons.water_drop,
+  'healing' => Icons.healing,
+  _ => Icons.apps,
+};
 
 /// The landing tab: header with search, salawat + reminder cards, category grid.
 class HomePage extends StatefulWidget {
@@ -74,61 +74,78 @@ class _HomePageState extends State<HomePage> {
     final arabic = Store.b('arabicDigits', def: true);
     final data = _data;
     return Scaffold(
-      body: Column(
-        children: [
-          _buildHeader(context, scheme, arabic),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: _SalawatCard(
-              fav: _salawatFav,
-              arabic: arabic,
-              onFav: () {
-                setState(() => _salawatFav = !_salawatFav);
-                Store.setB('salawatFav', _salawatFav);
-              },
-              onSettings: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const PlaceholderPage(title: 'إعدادات الصلاة على النبي'),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1000),
+          child: Column(
+            children: [
+              _buildHeader(context, scheme, arabic),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: _SalawatCard(
+                  fav: _salawatFav,
+                  arabic: arabic,
+                  onFav: () {
+                    setState(() => _salawatFav = !_salawatFav);
+                    Store.setB('salawatFav', _salawatFav);
+                  },
+                  onSettings: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const PlaceholderPage(
+                        title: 'إعدادات الصلاة على النبي',
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          if (_notifCard)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: _NotifCard(
-                onEnable: _enableNotifications,
-                onLater: () {
-                  setState(() => _notifCard = false);
-                  Store.setB('notifDismissed', true);
-                },
-              ),
-            ),
-          Expanded(
-            child: data == null
-                ? const Center(child: CircularProgressIndicator())
-                : GridView.builder(
-                    padding: const EdgeInsets.all(16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 1.35,
-                    ),
-                    itemCount: data.categories.length,
-                    itemBuilder: (context, i) =>
-                        _CategoryTile(category: data.categories[i], arabic: arabic),
+              if (_notifCard)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: _NotifCard(
+                    onEnable: _enableNotifications,
+                    onLater: () {
+                      setState(() => _notifCard = false);
+                      Store.setB('notifDismissed', true);
+                    },
                   ),
+                ),
+              Expanded(
+                child: data == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : LayoutBuilder(
+                        builder: (context, constraints) {
+                          // wider window: more columns, capped at 5
+                          final cross = (constraints.maxWidth / 260)
+                              .floor()
+                              .clamp(2, 5)
+                              .toInt();
+                          return GridView.builder(
+                            padding: const EdgeInsets.all(16),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: cross,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  childAspectRatio: 1.35,
+                                ),
+                            itemCount: data.categories.length,
+                            itemBuilder: (context, i) => _CategoryTile(
+                              category: data.categories[i],
+                              arabic: arabic,
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(
-      BuildContext context, ColorScheme scheme, bool arabic) {
+  Widget _buildHeader(BuildContext context, ColorScheme scheme, bool arabic) {
     return HeaderGradient(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
       child: Stack(
@@ -139,7 +156,9 @@ class _HomePageState extends State<HomePage> {
             child: SizedBox(
               width: 120,
               height: 120,
-              child: CustomPaint(painter: _StarPainter(color: scheme.onPrimary)),
+              child: CustomPaint(
+                painter: _StarPainter(color: scheme.onPrimary),
+              ),
             ),
           ),
           Column(
@@ -148,15 +167,14 @@ class _HomePageState extends State<HomePage> {
               Text(
                 'وَذَكِر',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: scheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: scheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 formatHijri(DateTime.now(), arabicDigits: arabic),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: scheme.onPrimary.withValues(alpha: 0.85),
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: scheme.onPrimary.withValues(alpha: 0.85)),
               ),
               const SizedBox(height: 12),
               GestureDetector(
@@ -167,16 +185,21 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: scheme.onPrimary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.search,
-                          size: 20, color: scheme.onPrimary.withValues(alpha: 0.7)),
+                      Icon(
+                        Icons.search,
+                        size: 20,
+                        color: scheme.onPrimary.withValues(alpha: 0.7),
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'ابحث في الأذكار',
@@ -246,20 +269,26 @@ class _SalawatCard extends StatelessWidget {
         child: Row(
           children: [
             IconButton(
-              icon: Icon(fav ? Icons.favorite : Icons.favorite_border,
-                  color: scheme.primary),
+              icon: Icon(
+                fav ? Icons.favorite : Icons.favorite_border,
+                color: scheme.primary,
+              ),
               onPressed: onFav,
             ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('صلِّ على محمد ﷺ',
-                      style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'صلِّ على محمد ﷺ',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: scheme.primaryContainer,
                       borderRadius: BorderRadius.circular(12),
@@ -267,7 +296,9 @@ class _SalawatCard extends StatelessWidget {
                     child: Text(
                       'كل ساعة • ٠٨:٠٠ ص - ١٠:٠٠ م',
                       style: TextStyle(
-                          fontSize: 12, color: scheme.onPrimaryContainer),
+                        fontSize: 12,
+                        color: scheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ],
@@ -304,8 +335,7 @@ class _NotifCard extends StatelessWidget {
                 color: scheme.primaryContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child:
-                  Icon(Icons.notifications_outlined, color: scheme.primary),
+              child: Icon(Icons.notifications_outlined, color: scheme.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -364,17 +394,21 @@ class _CategoryTile extends StatelessWidget {
                       color: scheme.primaryContainer,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(categoryIcon(category.icon),
-                        size: 22, color: scheme.primary),
+                    child: Icon(
+                      categoryIcon(category.icon),
+                      size: 22,
+                      color: scheme.primary,
+                    ),
                   ),
                   const Spacer(),
-                  Text(category.title,
-                      style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    category.title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   Text(
                     adhkarCountLabel(count, arabicDigits: arabic),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ],
               ),
