@@ -13,6 +13,7 @@ abstract final class WaZaqerTheme {
     );
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Noto Naskh Arabic', // bundled OFL naskh, Arabic-first default
       colorScheme: scheme,
       cardTheme: const CardThemeData(
         elevation: 0,
