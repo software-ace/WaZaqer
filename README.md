@@ -1,17 +1,29 @@
-# wazaqer
+# WaZaqer
 
-Flutter app to read Azqar.
+A free and open-source Flutter app for daily adhkar (remembrance): after prayer, morning, evening, and sleep.
 
-## Getting Started
+تطبيق حر ومفتوح المصدر للأذكار اليومية: أذكار بعد الصلاة، الصباح، المساء، والنوم.
 
-This project is a starting point for a Flutter application.
+## Status
 
-A few resources to get you started if this is your first Flutter project:
+The app is being rebuilt from scratch. The first release will follow the new UI/UX design.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Build
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Requires the Flutter SDK (stable channel).
+
+```sh
+flutter pub get
+flutter build apk --release     # Android
+flutter build linux --release   # Linux desktop
+```
+
+or run it directly with `flutter run`.
+
+## F-Droid
+
+Fastlane metadata lives in `fastlane/metadata/android/` (English and Arabic), ready to be referenced from an fdroiddata build recipe.
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE).
