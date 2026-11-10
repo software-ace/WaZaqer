@@ -33,7 +33,7 @@ jobs:
 
       - name: Package
         run: |
-          $name = "WaZaqer-$env:GITHUB_REF_NAME-windows-x64"
+          $name = "WaZaqer-$($env:GITHUB_REF_NAME -replace '/', '-')-windows-x64"
           $bundle = "$PWD\build\windows\x64\runner\Release"
           # The Visual C++ runtime goes next to the exe: a fresh Windows may not have it.
           Copy-Item C:\Windows\System32\msvcp140.dll, C:\Windows\System32\vcruntime140.dll, C:\Windows\System32\vcruntime140_1.dll $bundle

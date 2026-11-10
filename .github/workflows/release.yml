@@ -88,12 +88,14 @@ jobs:
         run: flutter build apk --release --split-per-abi
 
       # app-arm64-v8a-release.apk → WaZaqer-v1.0.0-arm64-v8a.apk
+      # (a branch name's "/" becomes "-", or mv reads it as a directory)
       - name: Rename artifacts
         run: |
+          ref="${GITHUB_REF_NAME//\//-}"
           mkdir -p dist
           for f in build/app/outputs/flutter-apk/app-*-release.apk; do
             abi=$(basename "$f" | sed -E 's/^app-(.+)-release\.apk$/\1/')
-            mv "$f" "dist/WaZaqer-${GITHUB_REF_NAME}-${abi}.apk"
+            mv "$f" "dist/WaZaqer-${ref}-${abi}.apk"
           done
           ls -lh dist
 
@@ -173,7 +175,7 @@ jobs:
       - name: Package
         run: |
           mkdir -p dist
-          name="WaZaqer-${GITHUB_REF_NAME}-linux-x64"
+          name="WaZaqer-${GITHUB_REF_NAME//\//-}-linux-x64"
           tar -C build/linux/x64/release -czf "dist/${name}.tar.gz" \
             --transform 's,^bundle,WaZaqer,' bundle
           ls -lh dist
