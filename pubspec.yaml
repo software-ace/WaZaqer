@@ -132,6 +132,11 @@ flutter:
 
 flutter_launcher_icons:
   image_path: assets/icon/icon.png
-  adaptive_icon_background: "#030104"
+  # Adaptive icon: the calligraphy alone over the artwork's panel navy; the
+  # launcher's mask stands in for the gold frame, which a circle would cut.
+  adaptive_icon_background: "#011D28"
   adaptive_icon_foreground: assets/icon/foreground.png
   android: true
+  windows:
+    generate: true
+    icon_size: 256
