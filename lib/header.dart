@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Gradient band behind header content. The arch shape around it comes from
-/// [MihrabPage], which every shell page sits on.
+/// Gradient band behind header content.
 class HeaderGradient extends StatelessWidget {
   const HeaderGradient({super.key, required this.child, this.padding});
 
@@ -81,64 +80,4 @@ class WaZaqerHeader extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Page background: full-bleed gradient with the content area cut out as a
-/// single giant pointed arch (mihrab) whose legs run to the bottom corners
-/// as border pillars. Content renders on top, inside the arch.
-class MihrabPage extends StatelessWidget {
-  const MihrabPage({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [scheme.primary, scheme.tertiary],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-            ),
-          ),
-        ),
-        ClipPath(
-          clipper: const MihrabClipper(),
-          child: ColoredBox(color: scheme.surface),
-        ),
-        child,
-      ],
-    );
-  }
-}
-
-/// Interior of the single giant arch framing the page.
-class MihrabClipper extends CustomClipper<Path> {
-  const MihrabClipper();
-
-  @override
-  Path getClip(Size size) {
-    const f = 14.0; // pillar width
-    final cx = size.width / 2;
-    // apex just below the header band so the arch line stays visible
-    final y0 = (size.height * 0.32).clamp(270.0, 420.0).toDouble();
-    final cy = y0 + size.height * 0.20;
-    return Path()
-      ..moveTo(f, size.height)
-      ..quadraticBezierTo(cx - size.width * 0.40, cy, cx, y0)
-      ..quadraticBezierTo(
-        cx + size.width * 0.40,
-        cy,
-        size.width - f,
-        size.height,
-      )
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> old) => false;
 }

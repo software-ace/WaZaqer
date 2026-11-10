@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'header.dart';
 import 'home.dart';
 import 'prayer_page.dart';
 import 'qibla.dart';
@@ -30,22 +29,20 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MihrabPage(
-        // Tabs are rebuilt (not const) on every settings change so they pick
-        // up digits, location and method; their State survives.
-        child: ValueListenableBuilder(
-          valueListenable: Store.rev,
-          builder: (context, _, _) => IndexedStack(
-            index: _index,
-            children: [
-              HomePage(),
-              TasbeehPage(),
-              // built only while shown, so the compass sensor stops
-              _index == 2 ? QiblaPage() : const SizedBox.shrink(),
-              PrayerTimesPage(),
-              SettingsPage(),
-            ],
-          ),
+      // Tabs are rebuilt (not const) on every settings change so they pick
+      // up digits, location and method; their State survives.
+      body: ValueListenableBuilder(
+        valueListenable: Store.rev,
+        builder: (context, _, _) => IndexedStack(
+          index: _index,
+          children: [
+            HomePage(),
+            TasbeehPage(),
+            // built only while shown, so the compass sensor stops
+            _index == 2 ? QiblaPage() : const SizedBox.shrink(),
+            PrayerTimesPage(),
+            SettingsPage(),
+          ],
         ),
       ),
       bottomNavigationBar: NavigationBar(

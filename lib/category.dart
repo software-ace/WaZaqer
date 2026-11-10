@@ -32,13 +32,16 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   late final _iconOf = {
-    for (final c in widget.data.categories) c.id: categoryIcon(c.icon)
+    for (final c in widget.data.categories) c.id: categoryIcon(c.icon),
   };
 
   List<DhikrGroup> get _groups {
     final byId = {for (final g in widget.data.groups) g.id: g};
     final base = widget.category == null
-        ? [for (final id in _favs) if (byId[id] != null) byId[id]!]
+        ? [
+            for (final id in _favs)
+              if (byId[id] != null) byId[id]!,
+          ]
         : [for (final id in widget.category!.groupIds) byId[id]!];
     final q = searchKey(_query);
     if (q.isEmpty) return base;
@@ -46,7 +49,7 @@ class _CategoryPageState extends State<CategoryPage> {
       for (final g in base)
         if (searchKey(g.title).contains(q) ||
             g.items.any((i) => searchKey(i.text).contains(q)))
-          g
+          g,
     ];
   }
 
@@ -55,92 +58,91 @@ class _CategoryPageState extends State<CategoryPage> {
     final scheme = Theme.of(context).colorScheme;
     final title = widget.category?.title ?? 'المفضلة';
     final groups = _groups;
-    // transparent: MihrabPage paints the page background, as in the shell
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: MihrabPage(
-        child: Column(
-          children: [
-            WaZaqerHeader(title: title, showBack: true),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: TextField(
-                onChanged: (v) => setState(() => _query = v),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: 'ابحث',
-                  isDense: true,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
+      body: Column(
+        children: [
+          WaZaqerHeader(title: title, showBack: true),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: TextField(
+              onChanged: (v) => setState(() => _query = v),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: 'ابحث',
+                isDense: true,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
-            Expanded(
-              child: groups.isEmpty && _query.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.favorite_border,
-                              size: 48, color: scheme.onSurfaceVariant),
-                          const SizedBox(height: 12),
-                          const Text('لا توجد مفضلات بعد'),
-                        ],
-                      ),
-                    )
-                  : groups.isEmpty
-                      ? const Center(child: Text('لا نتائج'))
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: groups.length,
-                          itemBuilder: (context, i) {
-                            final g = groups[i];
-                            return Card(
-                              child: ListTile(
-                                leading: IconButton(
-                                  icon: Icon(
-                                    _isFav(g.id)
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color: _isFav(g.id)
-                                        ? scheme.error
-                                        : scheme.onSurfaceVariant,
-                                  ),
-                                  onPressed: () => _toggleFav(g.id),
-                                ),
-                                title: Text(
-                                  g.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                trailing: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: scheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    _iconOf[g.category] ?? Icons.menu_book,
-                                    size: 20,
-                                    color: scheme.primary,
-                                  ),
-                                ),
-                                onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => ReaderPage(group: g),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+          ),
+          Expanded(
+            child: groups.isEmpty && _query.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.favorite_border,
+                          size: 48,
+                          color: scheme.onSurfaceVariant,
                         ),
-            ),
-          ],
-        ),
+                        const SizedBox(height: 12),
+                        const Text('لا توجد مفضلات بعد'),
+                      ],
+                    ),
+                  )
+                : groups.isEmpty
+                ? const Center(child: Text('لا نتائج'))
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: groups.length,
+                    itemBuilder: (context, i) {
+                      final g = groups[i];
+                      return Card(
+                        child: ListTile(
+                          leading: IconButton(
+                            icon: Icon(
+                              _isFav(g.id)
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: _isFav(g.id)
+                                  ? scheme.error
+                                  : scheme.onSurfaceVariant,
+                            ),
+                            onPressed: () => _toggleFav(g.id),
+                          ),
+                          title: Text(
+                            g.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: scheme.primaryContainer,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              _iconOf[g.category] ?? Icons.menu_book,
+                              size: 20,
+                              color: scheme.primary,
+                            ),
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ReaderPage(group: g),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

@@ -69,9 +69,7 @@ class _HomePageState extends State<HomePage> {
     final scheme = Theme.of(context).colorScheme;
     final arabic = Store.b('arabicDigits', def: true);
     final data = _data;
-    // transparent: MihrabPage in AppShell paints the page background
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1000),

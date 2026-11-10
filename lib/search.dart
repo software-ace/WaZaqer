@@ -49,86 +49,83 @@ class _SearchPageState extends State<SearchPage> {
     final scheme = Theme.of(context).colorScheme;
     final results = _results;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: MihrabPage(
-        child: Column(
-          children: [
-            const WaZaqerHeader(title: 'البحث', showBack: true),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: TextField(
-                autofocus: true,
-                onChanged: (v) => setState(() => _query = v),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: 'ابحث في جميع الأذكار',
-                  isDense: true,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
+      body: Column(
+        children: [
+          const WaZaqerHeader(title: 'البحث', showBack: true),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: TextField(
+              autofocus: true,
+              onChanged: (v) => setState(() => _query = v),
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search),
+                hintText: 'ابحث في جميع الأذكار',
+                isDense: true,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
-            Expanded(
-              child: results.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.search_off,
-                              size: 48, color: scheme.onSurfaceVariant),
-                          const SizedBox(height: 12),
-                          _query.isEmpty
-                              ? const Text('اكتب للبحث في جميع الأذكار')
-                              : const Text('لا نتائج'),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: results.length,
-                      itemBuilder: (context, i) {
-                        final (g, byTitle) = results[i];
-                        final fav = _favs.contains(g.id);
-                        return Card(
-                          child: ListTile(
-                            leading: IconButton(
-                              icon: Icon(
-                                fav ? Icons.favorite : Icons.favorite_border,
-                                color:
-                                    fav ? scheme.error : scheme.onSurfaceVariant,
-                              ),
-                              onPressed: () => _toggleFav(g.id),
+          ),
+          Expanded(
+            child: results.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 48,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(height: 12),
+                        _query.isEmpty
+                            ? const Text('اكتب للبحث في جميع الأذكار')
+                            : const Text('لا نتائج'),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: results.length,
+                    itemBuilder: (context, i) {
+                      final (g, byTitle) = results[i];
+                      final fav = _favs.contains(g.id);
+                      return Card(
+                        child: ListTile(
+                          leading: IconButton(
+                            icon: Icon(
+                              fav ? Icons.favorite : Icons.favorite_border,
+                              color: fav
+                                  ? scheme.error
+                                  : scheme.onSurfaceVariant,
                             ),
-                            title: Text(
-                              g.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            trailing: Text(
-                              byTitle ? 'في العنوان' : 'في النص',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                            ),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ReaderPage(group: g),
-                              ),
+                            onPressed: () => _toggleFav(g.id),
+                          ),
+                          title: Text(
+                            g.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: Text(
+                            byTitle ? 'في العنوان' : 'في النص',
+                            style: Theme.of(context).textTheme.labelSmall
+                                ?.copyWith(color: scheme.onSurfaceVariant),
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ReaderPage(group: g),
                             ),
                           ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

@@ -97,7 +97,6 @@ class _TasbeehPageState extends State<TasbeehPage> {
     final arabic = Store.b('arabicDigits', def: true);
     final t = _st.target;
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: GestureDetector(
         // behaviour: opaque so taps on empty areas count too; the bottom
         // navigation sits outside this body and is unaffected.
