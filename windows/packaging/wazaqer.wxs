@@ -1,0 +1,35 @@
+<!--
+  The MSI installer (WiX 5), for installing everywhere in an organization.
+  Built by the release workflow from the Flutter bundle:
+    wix build wazaqer.wxs -arch x64 -pdbtype none -d Version=1.0.0 -d SourceDir=<bundle> -d IconFile=<app_icon.ico> -o <name>.msi
+  Uninstalling keeps your settings, favourites and reading progress.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- UpgradeCode is fixed: a newer MSI replaces an older one by it. -->
+  <Package Name="WaZaqer" Manufacturer="software-ace" Version="$(var.Version)"
+           UpgradeCode="a1d56d17-147c-45ec-85b8-563216c2312f" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of WaZaqer is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="AppIcon" SourceFile="$(var.IconFile)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="WaZaqer">
+        <!-- Files (WiX 5+): harvests the whole bundle, data\ included. -->
+        <Files Include="$(var.SourceDir)\**" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="AppShortcut" Name="WaZaqer" Target="[INSTALLFOLDER]wazaqer.exe"
+                  WorkingDirectory="INSTALLFOLDER" Icon="AppIcon">
+          <ShortcutProperty Key="System.AppUserModel.ID" Value="ace.software.wazaqer" />
+        </Shortcut>
+        <RegistryValue Root="HKLM" Key="Software\software-ace\WaZaqer" Name="installed"
+                       Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+  </Package>
+</Wix>

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=WaZaqer
+Name[ar]=وَذَكِر
+Comment=Daily adhkar, tasbeeh, prayer times and qibla
+Comment[ar]=الأذكار اليومية والسبحة ومواقيت الصلاة والقبلة
+Exec=wazaqer
+Icon=ace.software.wazaqer
+Terminal=false
+Categories=Education;Utility;
+Keywords=adhkar;azkar;dhikr;islam;muslim;prayer;qibla;tasbeeh;أذكار;
+StartupNotify=true
+StartupWMClass=ace.software.wazaqer

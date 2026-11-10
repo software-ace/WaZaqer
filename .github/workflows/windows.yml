@@ -1,7 +1,7 @@
 name: Windows
 
-# The Windows zip: unpack anywhere and run wazaqer.exe. The Release workflow
-# calls this for each tag and attaches the zip to the release; a push to
+# The Windows zip, setup.exe and .msi. The Release workflow calls this for
+# each tag and attaches them to the release; a push to
 # windows-ci or a manual run keeps it as a build artifact, to try before a
 # release.
 on:
@@ -31,14 +31,33 @@ jobs:
       - name: Build Windows bundle
         run: flutter build windows --release
 
+      # Pinned and checksummed, like the Linux tools: they shape what users
+      # install. WiX stays on 5.x, the last release under the MS-RL license
+      # (6+ adds a maintenance-fee EULA).
+      - name: Install packaging tools
+        run: |
+          curl.exe -fsSL -o innosetup.exe https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe
+          if ((Get-FileHash innosetup.exe -Algorithm SHA256).Hash -ne '9C73C3BAE7ED48D44112A0F48E66742C00090BDB5BEF71D9D3C056C66E97B732') { throw 'Inno Setup checksum mismatch' }
+          Start-Process .\innosetup.exe -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/DIR=C:\InnoSetup' -Wait
+          dotnet tool install --global wix --version 5.0.2
+
+      # Three ways to get the same bundle:
+      # - zip: unpack anywhere and run wazaqer.exe.
+      # - setup.exe (Inno Setup): for you or for everyone, with a Start menu entry.
+      # - .msi (WiX): per machine, for installing across an organization.
       - name: Package
         run: |
           $name = "WaZaqer-$($env:GITHUB_REF_NAME -replace '/', '-')-windows-x64"
+          $version = (Select-String -Path pubspec.yaml -Pattern '^version:\s*([^+\s]+)').Matches[0].Groups[1].Value
           $bundle = "$PWD\build\windows\x64\runner\Release"
           # The Visual C++ runtime goes next to the exe: a fresh Windows may not have it.
           Copy-Item C:\Windows\System32\msvcp140.dll, C:\Windows\System32\vcruntime140.dll, C:\Windows\System32\vcruntime140_1.dll $bundle
           New-Item -ItemType Directory dist | Out-Null
           Compress-Archive -Path "$bundle\*" -DestinationPath "dist\$name.zip"
+          & C:\InnoSetup\ISCC.exe /Q "/DAppVersion=$version" "/DSourceDir=$bundle" "/DOutputDir=$PWD\dist" "/DOutputName=$name-setup" windows\packaging\wazaqer.iss
+          if ($LASTEXITCODE) { throw 'Inno Setup failed' }
+          wix build windows\packaging\wazaqer.wxs -arch x64 -pdbtype none -d "Version=$version" -d "SourceDir=$bundle" -d "IconFile=$PWD\windows\runner\resources\app_icon.ico" -o "dist\$name.msi"
+          if ($LASTEXITCODE) { throw 'WiX failed' }
           Get-ChildItem dist
 
       - name: Attach to GitHub Release

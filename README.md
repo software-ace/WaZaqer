@@ -56,7 +56,15 @@ or run it directly with `flutter run`. Reminders work on Android only; the deskt
 
 ## Releases
 
-The **Release** workflow (`.github/workflows/release.yml`) runs analyze and tests, then builds split-per-ABI APKs and the Linux and Windows bundles. A push of a tag `vX.Y.Z` publishes a GitHub release; the tag must match `version:` in `pubspec.yaml`. A manual run of the workflow only uploads the builds as artifacts.
+The **Release** workflow (`.github/workflows/release.yml`) runs analyze and tests, then builds:
+
+| Platform | Downloads |
+|---|---|
+| Android | One APK per CPU type: `arm64-v8a` (most phones), `armeabi-v7a`, `x86_64` |
+| Linux | `.deb`, `.rpm`, AppImage (with `.zsync` for in-place updates), `.tar.gz` |
+| Windows | `setup.exe` (Inno Setup, per user or for everyone), `.msi` (per machine), `.zip` |
+
+Packaging lives in `linux/packaging/` (nfpm, AppImage script, desktop entry) and `windows/packaging/` (Inno Setup and WiX scripts). A push of a tag `vX.Y.Z` publishes a GitHub release; the tag must match `version:` in `pubspec.yaml`. A manual run of the workflow only uploads the builds as artifacts.
 
 Release APKs are signed with one key, from `android/key.properties` locally (gitignored) or from the `ANDROID_KEYSTORE_*` / `ANDROID_KEY_*` repository secrets in CI. Tag builds refuse to fall back to the debug key.
 
