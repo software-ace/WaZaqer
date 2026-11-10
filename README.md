@@ -1,4 +1,15 @@
+<p align="center">
+  <img src=".github/social-preview.png" alt="WaZaqer (وَذَكِر): free and open-source adhkar app, offline, no ads" width="100%">
+</p>
+
 # WaZaqer (وَذَكِر)
+
+[![Release](https://github.com/software-ace/WaZaqer/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/software-ace/WaZaqer/actions/workflows/release.yml)
+[![License: GPL-3.0](https://img.shields.io/github/license/software-ace/WaZaqer)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.47.8-02569B?logo=flutter)](https://flutter.dev)
+[![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20Linux%20%7C%20Windows-0E7C5B)](#build)
+[![No ads, no trackers](https://img.shields.io/badge/ads%20%26%20trackers-none-0E7C5B)](#privacy)
+[![Sponsor](https://img.shields.io/github/sponsors/software-ace?logo=githubsponsors&label=Sponsor&color=EA4AAA)](https://github.com/sponsors/software-ace)
 
 A free and open-source Flutter app for daily adhkar (remembrance): after prayer, morning, evening, and sleep.
 
