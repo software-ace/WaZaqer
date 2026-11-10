@@ -111,6 +111,18 @@ String stripTashkeel(String s) => s
     .replaceAll(RegExp(r'\s+'), ' ')
     .trim();
 
+/// Search key: beyond tashkeel, matches ignore hamza/alef variants and
+/// taa marbuta/ya so «قاضى» finds «قاضي» and «أُذكِرة» finds «اذكرة».
+String searchKey(String s) {
+  s = stripTashkeel(s);
+  const from = ['أ', 'إ', 'آ', 'ٱ', 'ة', 'ى'];
+  const to = ['ا', 'ا', 'ا', 'ا', 'ه', 'ي'];
+  for (var i = 0; i < from.length; i++) {
+    s = s.replaceAll(from[i], to[i]);
+  }
+  return s;
+}
+
 /// Repeat-count label: مرة واحدة، مرتان، ٣ مرات، ١٠٠ مرة
 String repeatLabel(int count, {bool arabicDigits = true}) {
   final n = digits(count, arabic: arabicDigits);

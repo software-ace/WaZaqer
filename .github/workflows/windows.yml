@@ -1,0 +1,56 @@
+name: Windows
+
+# The Windows zip: unpack anywhere and run wazaqer.exe. The Release workflow
+# calls this for each tag and attaches the zip to the release; a push to
+# windows-ci or a manual run keeps it as a build artifact, to try before a
+# release.
+on:
+  push:
+    branches: [windows-ci]
+  workflow_dispatch: {}
+  workflow_call: {}
+
+# Attaching to a release needs contents: write. Actions are pinned to commit
+# hashes, as in release.yml.
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    # A fixed image, so the Visual Studio and runtime it builds with don't
+    # change under us.
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: pubspec.yaml
+
+      - name: Build Windows bundle
+        run: flutter build windows --release
+
+      - name: Package
+        run: |
+          $name = "WaZaqer-$env:GITHUB_REF_NAME-windows-x64"
+          $bundle = "$PWD\build\windows\x64\runner\Release"
+          # The Visual C++ runtime goes next to the exe: a fresh Windows may not have it.
+          Copy-Item C:\Windows\System32\msvcp140.dll, C:\Windows\System32\vcruntime140.dll, C:\Windows\System32\vcruntime140_1.dll $bundle
+          New-Item -ItemType Directory dist | Out-Null
+          Compress-Archive -Path "$bundle\*" -DestinationPath "dist\$name.zip"
+          Get-ChildItem dist
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${GITHUB_REF_NAME}" dist/* --clobber
+
+      - name: Upload artifact (not a release)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: WaZaqer-windows
+          path: dist/*

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'header.dart';
 import 'home.dart';
+import 'tasbeeh.dart';
 
 /// Bottom-nav shell with the five tabs. Active item gets the M3 pill.
 class AppShell extends StatefulWidget {
@@ -30,7 +31,8 @@ class _AppShellState extends State<AppShell> {
           index: _index,
           children: [
             const HomePage(),
-            for (final tab in _tabs.skip(1)) _TabPage(title: tab.$2),
+            const TasbeehPage(),
+            for (final tab in _tabs.skip(2)) _TabPage(title: tab.$2),
           ],
         ),
       ),

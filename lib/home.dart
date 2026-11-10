@@ -9,6 +9,7 @@ import 'digits.dart';
 import 'header.dart';
 import 'hijri.dart';
 import 'placeholder.dart';
+import 'search.dart';
 import 'store.dart';
 
 /// Arabic plural: ذكر واحد، ذكران، ٣-١٠ أذكار، ١١+ ذكرًا
@@ -84,7 +85,7 @@ class _HomePageState extends State<HomePage> {
           constraints: const BoxConstraints(maxWidth: 1000),
           child: Column(
             children: [
-              _buildHeader(context, scheme, arabic),
+              _buildHeader(context, scheme, arabic, data),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: _SalawatCard(
@@ -168,7 +169,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ColorScheme scheme, bool arabic) {
+  Widget _buildHeader(BuildContext context, ColorScheme scheme, bool arabic,
+      AdhkarData? data) {
     return HeaderGradient(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
       child: Stack(
@@ -201,12 +203,14 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const PlaceholderPage(title: 'البحث'),
-                  ),
-                ),
+                onTap: data == null
+                    ? null
+                    : () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SearchPage(data: data),
+                          ),
+                        ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,

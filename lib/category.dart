@@ -35,12 +35,12 @@ class _CategoryPageState extends State<CategoryPage> {
     final base = widget.category == null
         ? [for (final id in _favs) if (byId[id] != null) byId[id]!]
         : [for (final id in widget.category!.groupIds) byId[id]!];
-    final q = stripTashkeel(_query);
+    final q = searchKey(_query);
     if (q.isEmpty) return base;
     return [
       for (final g in base)
-        if (stripTashkeel(g.title).contains(q) ||
-            g.items.any((i) => stripTashkeel(i.text).contains(q)))
+        if (searchKey(g.title).contains(q) ||
+            g.items.any((i) => searchKey(i.text).contains(q)))
           g
     ];
   }
