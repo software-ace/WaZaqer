@@ -44,6 +44,9 @@ dependencies:
   permission_handler: 12.0.1
   wakelock_plus: ^1.8.2
   share_plus: ^13.3.1
+  flutter_local_notifications: ^23.0.0
+  timezone: ^0.11.2
+  sensors_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +73,7 @@ flutter:
 
   assets:
     - assets/adhkar.json
+    - assets/icon/icon.png # Linux window icon (linux/runner/my_application.cc)
 
   fonts:
     - family: Amiri

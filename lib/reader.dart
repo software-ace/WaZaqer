@@ -7,14 +7,14 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'adhkar.dart';
 import 'digits.dart';
+import 'reminders.dart';
 import 'store.dart';
 
 /// Paged dhikr reader: one dhikr per card, a built-in tap counter with a
 /// progress ring, auto-advance, persisted per-group progress, and a
 /// completion state after the last dhikr.
 ///
-/// Settings are read from Store with defaults; the settings UI comes with
-/// the settings epic.
+/// Settings are read from Store with the same defaults as the settings page.
 class ReaderPage extends StatefulWidget {
   const ReaderPage({super.key, required this.group});
 
@@ -132,16 +132,7 @@ class _ReaderPageState extends State<ReaderPage> {
     }
   }
 
-  void _reminders() {
-    // placeholder until the reminders epic lands
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => const Padding(
-        padding: EdgeInsets.all(24),
-        child: Text('التذكيرات — قريبًا'),
-      ),
-    );
-  }
+  void _reminders() => showReminderSheet(context, widget.group);
 
   @override
   Widget build(BuildContext context) {
@@ -185,10 +176,11 @@ class _ReaderPageState extends State<ReaderPage> {
     final text = Store.b('tashkeel', def: true)
         ? item.text
         : stripTashkeel(item.text);
-    final fontSize = Store.i('dhikrFontSize', def: 26);
+    // fontScale: percent of the 26px base, from the settings stepper
+    final fontSize = 26 * Store.i('fontScale', def: 100) / 100;
     final fontFamily = Store.s('fontFamily');
     final style = Theme.of(context).textTheme.titleLarge!.copyWith(
-          fontSize: fontSize.toDouble(),
+          fontSize: fontSize,
           height: 1.9,
           fontFamily:
               (fontFamily != null && fontFamily.isNotEmpty) ? fontFamily : null,

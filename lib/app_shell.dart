@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'header.dart';
 import 'home.dart';
+import 'prayer_page.dart';
+import 'qibla.dart';
+import 'settings.dart';
+import 'store.dart';
 import 'tasbeeh.dart';
 
 /// Bottom-nav shell with the five tabs. Active item gets the M3 pill.
@@ -27,13 +31,21 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: MihrabPage(
-        child: IndexedStack(
-          index: _index,
-          children: [
-            const HomePage(),
-            const TasbeehPage(),
-            for (final tab in _tabs.skip(2)) _TabPage(title: tab.$2),
-          ],
+        // Tabs are rebuilt (not const) on every settings change so they pick
+        // up digits, location and method; their State survives.
+        child: ValueListenableBuilder(
+          valueListenable: Store.rev,
+          builder: (context, _, _) => IndexedStack(
+            index: _index,
+            children: [
+              HomePage(),
+              TasbeehPage(),
+              // built only while shown, so the compass sensor stops
+              _index == 2 ? QiblaPage() : const SizedBox.shrink(),
+              PrayerTimesPage(),
+              SettingsPage(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: NavigationBar(
@@ -49,26 +61,6 @@ class _AppShellState extends State<AppShell> {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _TabPage extends StatelessWidget {
-  const _TabPage({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        WaZaqerHeader(title: title),
-        Expanded(
-          child: Center(
-            child: Text('قريبًا', style: Theme.of(context).textTheme.bodyLarge),
-          ),
-        ),
-      ],
     );
   }
 }

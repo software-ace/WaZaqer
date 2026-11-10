@@ -1,14 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'adhkar.dart';
 import 'category.dart';
 import 'digits.dart';
 import 'header.dart';
 import 'hijri.dart';
-import 'placeholder.dart';
+import 'reminders.dart';
 import 'search.dart';
 import 'store.dart';
 
@@ -60,16 +59,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _enableNotifications() async {
-    bool granted;
-    try {
-      granted =
-          await Permission.notification.request() == PermissionStatus.granted;
-    } on Exception {
-      // desktop has no notification permission; nothing to request
-      granted = true;
-    }
-    await Store.setB('notifGranted', granted);
-    if (granted || !mounted) setState(() => _notifCard = false);
+    final granted = await Reminders.requestPermission();
+    if (granted) await Reminders.enableDefaults();
+    if (granted && mounted) setState(() => _notifCard = false);
   }
 
   @override
@@ -98,9 +90,7 @@ class _HomePageState extends State<HomePage> {
                   onSettings: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const PlaceholderPage(
-                        title: 'إعدادات الصلاة على النبي',
-                      ),
+                      builder: (_) => const SalawatSettingsPage(),
                     ),
                   ),
                 ),
@@ -321,7 +311,7 @@ class _SalawatCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'كل ساعة • ٠٨:٠٠ ص - ١٠:٠٠ م',
+                      salawatSummary(arabic: arabic),
                       style: TextStyle(
                         fontSize: 12,
                         color: scheme.onPrimaryContainer,

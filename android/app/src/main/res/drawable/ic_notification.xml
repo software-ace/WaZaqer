@@ -1,0 +1,10 @@
+<!-- Monochrome status-bar icon: an eight-pointed star, like the home header art. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,1.5L15,5.1L19.4,4.6L18.9,9L22.5,12L18.9,15L19.4,19.4L15,18.9L12,22.5L9,18.9L4.6,19.4L5.1,15L1.5,12L5.1,9L4.6,4.6L9,5.1Z" />
+</vector>
