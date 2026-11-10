@@ -125,8 +125,14 @@ class _TasbeehPageState extends State<TasbeehPage> {
                   children: [
                     SegmentedButton<int?>(
                       segments: [
-                        ButtonSegment(value: 33, label: Text(digits(33, arabic: arabic))),
-                        ButtonSegment(value: 100, label: Text(digits(100, arabic: arabic))),
+                        ButtonSegment(
+                          value: 33,
+                          label: Text(digits(33, arabic: arabic)),
+                        ),
+                        ButtonSegment(
+                          value: 100,
+                          label: Text(digits(100, arabic: arabic)),
+                        ),
                         const ButtonSegment(value: null, label: Text('∞')),
                       ],
                       selected: {t},
@@ -135,38 +141,44 @@ class _TasbeehPageState extends State<TasbeehPage> {
                         _save();
                       },
                     ),
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: LayoutBuilder(
-                        builder: (context, box) {
-                          final size = box.biggest.width;
-                          return Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                width: size,
-                                height: size,
-                                child: CircularProgressIndicator(
-                                  value: t == null || _st.count == 0
-                                      ? null
-                                      : _st.count / t,
-                                  strokeWidth: 12,
-                                  strokeCap: StrokeCap.round,
-                                  color: scheme.primary,
-                                  backgroundColor:
-                                      scheme.primary.withValues(alpha: 0.15),
-                                ),
-                              ),
-                              Text(
-                                digits(_st.count, arabic: arabic),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge
-                                    ?.copyWith(color: scheme.onSurface),
-                              ),
-                            ],
-                          );
-                        },
+                    // Flexible: on a wide or short window the square takes the
+                    // space left, instead of the full width, and overflowing
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: LayoutBuilder(
+                            builder: (context, box) {
+                              final size = box.biggest.width;
+                              return Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  if (t != null)
+                                    SizedBox(
+                                      width: size,
+                                      height: size,
+                                      child: CircularProgressIndicator(
+                                        value: _st.count / t,
+                                        strokeWidth: 12,
+                                        strokeCap: StrokeCap.round,
+                                        color: scheme.primary,
+                                        backgroundColor: scheme.primary
+                                            .withValues(alpha: 0.15),
+                                      ),
+                                    ),
+                                  Text(
+                                    digits(_st.count, arabic: arabic),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge
+                                        ?.copyWith(color: scheme.onSurface),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                     Wrap(

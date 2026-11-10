@@ -1,4 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:wazaqer/store.dart';
 
 import 'package:wazaqer/tasbeeh.dart';
 
@@ -53,5 +57,21 @@ void main() {
     expect(st.cycles, 1);
     st.tap();
     expect(st.count, 1);
+  });
+
+  testWidgets('ring shows progress toward the target; ∞ has no ring',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await Store.init();
+    await tester.pumpWidget(const MaterialApp(home: TasbeehPage()));
+    final ring = find.byType(CircularProgressIndicator);
+    expect(tester.widget<CircularProgressIndicator>(ring).value, 0);
+    await tester.tap(find.text('٠'));
+    await tester.pump();
+    expect(tester.widget<CircularProgressIndicator>(ring).value, 1 / 33);
+
+    await tester.tap(find.text('∞').first);
+    await tester.pump();
+    expect(ring, findsNothing);
   });
 }

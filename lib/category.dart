@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'adhkar.dart';
 import 'header.dart';
+import 'home.dart' show categoryIcon;
 import 'reader.dart';
 import 'store.dart';
 
@@ -29,6 +30,10 @@ class _CategoryPageState extends State<CategoryPage> {
     });
     await Store.setList('favourites', _favs);
   }
+
+  late final _iconOf = {
+    for (final c in widget.data.categories) c.id: categoryIcon(c.icon)
+  };
 
   List<DhikrGroup> get _groups {
     final byId = {for (final g in widget.data.groups) g.id: g};
@@ -110,6 +115,18 @@ class _CategoryPageState extends State<CategoryPage> {
                                   g.title,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: scheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    _iconOf[g.category] ?? Icons.menu_book,
+                                    size: 20,
+                                    color: scheme.primary,
+                                  ),
                                 ),
                                 onTap: () => Navigator.push(
                                   context,
