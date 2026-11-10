@@ -14,6 +14,7 @@ import 'theme.dart';
 /// Kept in step with pubspec.yaml by test/settings_test.dart.
 const appVersion = '1.0.0';
 const sourceUrl = 'https://github.com/software-ace/WaZaqer';
+const sponsorUrl = 'https://github.com/sponsors/software-ace';
 
 /// Keys cleared by «reset all settings». Favourites, reading progress,
 /// tasbeeh counts, location and per-group reminders are user data and stay.
@@ -231,6 +232,16 @@ class SettingsPage extends StatelessWidget {
                   Clipboard.setData(const ClipboardData(text: sourceUrl));
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('تم نسخ الرابط')));
+                },
+              ),
+              ListTile(
+                title: const Text('ادعم المشروع'),
+                subtitle: const Text(sponsorUrl),
+                trailing: const Icon(Icons.volunteer_activism_outlined),
+                onTap: () {
+                  Clipboard.setData(const ClipboardData(text: sponsorUrl));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('تم نسخ رابط الدعم')));
                 },
               ),
               const ListTile(
