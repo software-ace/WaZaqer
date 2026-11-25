@@ -72,8 +72,9 @@ class _ReaderPageState extends State<ReaderPage> {
     if (Store.b('keepAwake', def: true)) {
       try {
         await WakelockPlus.toggle(enable: on);
-      } on Exception {
-        // keep-awake is a nicety; unsupported platforms stay silent
+      } catch (_) {
+        // keep-awake is a nicety; unsupported platforms (web throws a JS
+        // error, not an Exception) stay silent
       }
     }
   }

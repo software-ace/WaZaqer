@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -47,7 +48,8 @@ const _channel = MethodChannel('wazaqer/location');
 Future<void> useGps(BuildContext context) async {
   final messenger = ScaffoldMessenger.of(context);
   try {
-    if (await Permission.locationWhenInUse.request().isGranted) {
+    // web: no location channel, and this permission throws an Error there
+    if (!kIsWeb && await Permission.locationWhenInUse.request().isGranted) {
       final r = await _channel
           .invokeMapMethod<String, double>('current')
           .timeout(const Duration(seconds: 20));

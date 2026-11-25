@@ -52,7 +52,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _salawatFav = Store.b('salawatFav');
-    _notifCard = !Store.b('notifGranted') && !Store.b('notifDismissed');
+    _notifCard =
+        Reminders.supported &&
+        !Store.b('notifGranted') &&
+        !Store.b('notifDismissed');
     AdhkarData.load().then((d) => setState(() => _data = d));
   }
 

@@ -92,7 +92,7 @@ String minutesLabel(int n, {bool arabic = true}) {
 /// scheduler, so there the settings are kept but nothing fires.
 abstract final class Reminders {
   static final _plugin = FlutterLocalNotificationsPlugin();
-  static bool get _supported => !kIsWeb && Platform.isAndroid;
+  static bool get supported => !kIsWeb && Platform.isAndroid;
   static Future<void> _queue = Future.value();
 
   // shortcut: one-off alarms for the next 7 days, refreshed on every app
@@ -101,7 +101,7 @@ abstract final class Reminders {
   static const _days = 7;
 
   static Future<void> init(void Function(String groupId) onOpen) async {
-    if (!_supported) return;
+    if (!supported) return;
     await _plugin.initialize(
       settings: const InitializationSettings(
         android: AndroidInitializationSettings('ic_notification'),
@@ -150,7 +150,7 @@ abstract final class Reminders {
       _queue = _queue.catchError((_) {}).then((_) => _reschedule());
 
   static Future<void> _reschedule() async {
-    if (!_supported) return;
+    if (!supported) return;
     await _plugin.cancelAll();
     if (!await Permission.notification.isGranted) return;
     final now = DateTime.now();
