@@ -140,3 +140,11 @@ flutter_launcher_icons:
   windows:
     generate: true
     icon_size: 256
+  # Re-running this overwrites two hand-made web files; rebuild them after:
+  # - web/icons/Icon-maskable-*.png: foreground.png at 68% on #011D28, like
+  #   the Android adaptive icon (a circle mask would cut the gold frame)
+  # - web/favicon.png: 32px, the calligraphy alone (the frame is mush at 16px)
+  web:
+    generate: true
+    background_color: "#011D28"
+    theme_color: "#011D28"
