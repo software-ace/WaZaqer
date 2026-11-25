@@ -202,7 +202,8 @@ class SettingsPage extends StatelessWidget {
               ListTile(
                 title: const Text('تذكير الصلاة على النبي'),
                 subtitle: Text(salawatSummary(arabic: arabic)),
-                trailing: const Icon(Icons.chevron_left),
+                // mirrors under RTL, so it points left in Arabic
+                trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const SalawatSettingsPage()),

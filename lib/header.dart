@@ -25,7 +25,7 @@ class HeaderGradient extends StatelessWidget {
   }
 }
 
-/// Gradient app header with a curved bottom edge. RTL-aware back arrow.
+/// Gradient app header with a curved bottom edge. Back arrow mirrors under RTL.
 class WaZaqerHeader extends StatelessWidget {
   const WaZaqerHeader({
     super.key,
@@ -43,14 +43,15 @@ class WaZaqerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final rtl = Directionality.of(context) == TextDirection.rtl;
     return HeaderGradient(
       padding: const EdgeInsets.fromLTRB(8, 0, 8, 36),
       child: Row(
         children: [
           if (showBack)
             IconButton(
-              icon: Icon(rtl ? Icons.arrow_forward : Icons.arrow_back),
+              // arrow_back mirrors itself under RTL (matchTextDirection); swapping
+              // to arrow_forward here would flip it twice
+              icon: const Icon(Icons.arrow_back),
               color: scheme.onPrimary,
               onPressed: () => Navigator.maybePop(context),
             ),

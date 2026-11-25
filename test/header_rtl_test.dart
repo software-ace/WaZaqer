@@ -19,11 +19,22 @@ void main() {
           ),
         );
 
+    // arrow_back glyph points left; Icon mirrors it (x scale -1) under RTL.
+    // Check what's drawn, not which IconData was picked: picking
+    // arrow_forward under RTL gets mirrored too and points left again.
+    bool mirrored() {
+      final t = find.descendant(
+        of: find.byIcon(Icons.arrow_back),
+        matching: find.byType(Transform),
+      );
+      return t.evaluate().isNotEmpty &&
+          tester.widget<Transform>(t).transform.storage[0] == -1;
+    }
+
     await tester.pumpWidget(frame(TextDirection.rtl));
-    expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
-    expect(find.byIcon(Icons.arrow_back), findsNothing);
+    expect(mirrored(), isTrue, reason: 'points right under RTL');
 
     await tester.pumpWidget(frame(TextDirection.ltr));
-    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+    expect(mirrored(), isFalse, reason: 'points left under LTR');
   });
 }
