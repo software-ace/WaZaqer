@@ -69,8 +69,9 @@ jobs:
       # also what F-Droid builds from, so both channels ship the same
       # versionCode. A tag must match it (v1.0.0 ↔ version: 1.0.0+N).
       # --split-per-abi: one APK per CPU type, each about half the universal
-      # size (most phones need arm64-v8a). Flutter adds 1000 × ABI to the
-      # versionCode for split APKs, the scheme F-Droid asks for.
+      # size (most phones need arm64-v8a). android/app/build.gradle.kts sets
+      # each one's versionCode to build number × 10 + ABI (1 armeabi-v7a,
+      # 2 arm64-v8a, 3 x86_64), the scheme F-Droid asks for.
       - name: Check tag matches pubspec version
         if: startsWith(github.ref, 'refs/tags/v')
         run: |

@@ -1,0 +1,1 @@
+First release: adhkar with sources, a counter per dhikr, tasbeeh, offline prayer times, Qibla compass, and reminders for adhkar, salawat and adhan. No ads, no trackers.
