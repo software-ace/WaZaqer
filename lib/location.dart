@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'prayer.dart';
 import 'store.dart';
+import 'web/browser.dart';
 
 /// The user's stored location: from the GPS or a picked city. It stays on
 /// the device and is only asked for from the prayer-times and qibla tabs.
@@ -45,22 +46,27 @@ CalcMethod currentMethod(SavedLocation loc) => Store.b('autoMethod', def: true)
 // Play Services, which F-Droid builds can't ship.
 const _channel = MethodChannel('wazaqer/location');
 
+/// Android's position via the app's own channel; null on desktop (no
+/// plugin), with location off, permission refused or after 20 s.
+Future<(double, double)?> _deviceLocation() async {
+  try {
+    if (!await Permission.locationWhenInUse.request().isGranted) return null;
+    final r = await _channel
+        .invokeMapMethod<String, double>('current')
+        .timeout(const Duration(seconds: 20));
+    return r == null ? null : (r['lat']!, r['lng']!);
+  } on Exception {
+    return null;
+  }
+}
+
 Future<void> useGps(BuildContext context) async {
   final messenger = ScaffoldMessenger.of(context);
-  try {
-    // web: no location channel, and this permission throws an Error there
-    if (!kIsWeb && await Permission.locationWhenInUse.request().isGranted) {
-      final r = await _channel
-          .invokeMapMethod<String, double>('current')
-          .timeout(const Duration(seconds: 20));
-      if (r != null) {
-        final lat = r['lat']!, lng = r['lng']!;
-        await saveLocation(lat, lng, 'موقعي (قرب ${nearestCity(lat, lng).name})');
-        return;
-      }
-    }
-  } on Exception {
-    // no plugin on desktop, location off, or timed out: fall through
+  final pos = kIsWeb ? await browserLocation() : await _deviceLocation();
+  if (pos != null) {
+    final (lat, lng) = pos;
+    await saveLocation(lat, lng, 'موقعي (قرب ${nearestCity(lat, lng).name})');
+    return;
   }
   messenger.showSnackBar(
     const SnackBar(content: Text('تعذّر تحديد الموقع، اختر مدينة من القائمة')),

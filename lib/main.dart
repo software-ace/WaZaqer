@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'adhkar.dart';
@@ -6,8 +8,12 @@ import 'reader.dart';
 import 'reminders.dart';
 import 'store.dart';
 import 'theme.dart';
+import 'web/web_shell.dart';
 
 final _navigator = GlobalKey<NavigatorState>();
+
+/// Web pages have addresses; one router for the app's lifetime.
+final GoRouter _webRouter = buildWebRouter();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +37,11 @@ Future<void> _openGroup(String id) async {
 }
 
 class WaZaqerApp extends StatelessWidget {
-  const WaZaqerApp({super.key});
+  const WaZaqerApp({super.key, this.webRouter});
+
+  /// Web layout with its own addresses; given by tests. On the web build
+  /// it is always on. Elsewhere the app picks mobile or desktop by width.
+  final GoRouter? webRouter;
 
   @override
   Widget build(BuildContext context) {
@@ -41,19 +51,39 @@ class WaZaqerApp extends StatelessWidget {
         final seed = Color(
           Store.i('accent', def: WaZaqerTheme.seed.toARGB32()),
         );
+        final theme = WaZaqerTheme.of(seed, Brightness.light);
+        final darkTheme = WaZaqerTheme.of(seed, Brightness.dark);
+        // stored 0/1/2 = ThemeMode.system/light/dark
+        final themeMode = ThemeMode.values[Store.i('themeMode')];
+        // .delegates (plural) includes GlobalWidgetsLocalizations, which
+        // supplies the RTL text direction for Arabic; .delegate alone is LTR
+        const delegates = GlobalMaterialLocalizations.delegates;
+        const locales = [Locale('ar'), Locale('en')];
+        // Arabic first, English as secondary locale.
+        Locale arabicFirst(Locale? _, Iterable<Locale> supported) =>
+            supported.first;
+        final router = webRouter ?? (kIsWeb ? _webRouter : null);
+        if (router != null) {
+          return MaterialApp.router(
+            routerConfig: router,
+            title: 'وَذَكِر',
+            theme: theme,
+            darkTheme: darkTheme,
+            themeMode: themeMode,
+            localizationsDelegates: delegates,
+            supportedLocales: locales,
+            localeResolutionCallback: arabicFirst,
+          );
+        }
         return MaterialApp(
           navigatorKey: _navigator,
           title: 'وَذَكِر',
-          theme: WaZaqerTheme.of(seed, Brightness.light),
-          darkTheme: WaZaqerTheme.of(seed, Brightness.dark),
-          // stored 0/1/2 = ThemeMode.system/light/dark
-          themeMode: ThemeMode.values[Store.i('themeMode')],
-          // .delegates (plural) includes GlobalWidgetsLocalizations, which
-          // supplies the RTL text direction for Arabic; .delegate alone is LTR
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
-          supportedLocales: const [Locale('ar'), Locale('en')],
-          // Arabic first, English as secondary locale.
-          localeResolutionCallback: (locale, supported) => supported.first,
+          theme: theme,
+          darkTheme: darkTheme,
+          themeMode: themeMode,
+          localizationsDelegates: delegates,
+          supportedLocales: locales,
+          localeResolutionCallback: arabicFirst,
           home: const AppShell(),
         );
       },
