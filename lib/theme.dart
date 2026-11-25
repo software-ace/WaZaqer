@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 abstract final class WaZaqerTheme {
   static const seed = Color(0xFF0E7C5B); // deep green

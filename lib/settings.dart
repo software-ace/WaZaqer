@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 import 'digits.dart';
@@ -19,13 +19,31 @@ const sponsorUrl = 'https://github.com/sponsors/software-ace';
 /// Keys cleared by «reset all settings». Favourites, reading progress,
 /// tasbeeh counts, location and per-group reminders are user data and stay.
 const settingKeys = [
-  'accent', 'themeMode', 'arabicDigits', 'autoAdvance', 'haptics', 'sound',
-  'keepAwake', 'tashkeel', 'fontFamily', 'fontScale', 'autoMethod', 'method',
-  'adhan', 'salawatOn', 'salawatEvery', 'salawatFrom', 'salawatTo',
+  'accent',
+  'themeMode',
+  'arabicDigits',
+  'autoAdvance',
+  'haptics',
+  'sound',
+  'keepAwake',
+  'tashkeel',
+  'fontFamily',
+  'fontScale',
+  'autoMethod',
+  'method',
+  'adhan',
+  'salawatOn',
+  'salawatEvery',
+  'salawatFrom',
+  'salawatTo',
 ];
 
 const fontFamilies = [
-  'Noto Naskh Arabic', 'Amiri', 'Scheherazade New', 'Cairo', 'Reem Kufi',
+  'Noto Naskh Arabic',
+  'Amiri',
+  'Scheherazade New',
+  'Cairo',
+  'Reem Kufi',
   'Tajawal',
 ];
 
@@ -48,7 +66,8 @@ class SettingsPage extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('إعادة ضبط الإعدادات؟'),
         content: const Text(
-            'تعود جميع الإعدادات إلى قيمها الافتراضية. المفضلة والتقدم في القراءة والموقع تبقى كما هي.'),
+          'تعود جميع الإعدادات إلى قيمها الافتراضية. المفضلة والتقدم في القراءة والموقع تبقى كما هي.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -79,19 +98,23 @@ class SettingsPage extends StatelessWidget {
     final font = Store.s('fontFamily') ?? fontFamilies.first;
 
     Widget section(String title) => Padding(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
-          child: Text(title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(color: scheme.primary)),
-        );
-    Widget toggle(String title, String key, bool def, {bool reschedule = false}) =>
-        SwitchListTile(
-          title: Text(title),
-          value: Store.b(key, def: def),
-          onChanged: (v) => _set(Store.setB(key, v), reschedule: reschedule),
-        );
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall
+            ?.copyWith(color: scheme.primary),
+      ),
+    );
+    Widget toggle(
+      String title,
+      String key,
+      bool def, {
+      bool reschedule = false,
+    }) => SwitchListTile(
+      title: Text(title),
+      value: Store.b(key, def: def),
+      onChanged: (v) => _set(Store.setB(key, v), reschedule: reschedule),
+    );
 
     return Column(
       children: [
@@ -113,7 +136,10 @@ class SettingsPage extends StatelessWidget {
               section('واجهة التطبيق'),
               ListTile(
                 title: const Text('لون التطبيق'),
-                trailing: CircleAvatar(radius: 12, backgroundColor: Color(accent)),
+                trailing: CircleAvatar(
+                  radius: 12,
+                  backgroundColor: Color(accent),
+                ),
                 onTap: () => _pickAccent(context, accent),
               ),
               ListTile(
@@ -126,7 +152,8 @@ class SettingsPage extends StatelessWidget {
                     ButtonSegment(value: 2, label: Text('داكن')),
                   ],
                   selected: {Store.i('themeMode')},
-                  onSelectionChanged: (s) => _set(Store.setI('themeMode', s.first)),
+                  onSelectionChanged: (s) =>
+                      _set(Store.setI('themeMode', s.first)),
                 ),
               ),
               toggle('أرقام عربية', 'arabicDigits', true),
@@ -171,14 +198,17 @@ class SettingsPage extends StatelessWidget {
                 title: const Text('الحساب أوتوماتيكيا'),
                 subtitle: const Text('طريقة الحساب حسب المنطقة'),
                 value: auto,
-                onChanged: (v) => _set(Store.setB('autoMethod', v), reschedule: true),
+                onChanged: (v) =>
+                    _set(Store.setB('autoMethod', v), reschedule: true),
               ),
               ListTile(
                 enabled: !auto,
                 title: const Text('طريقة الحساب'),
-                subtitle: Text(loc != null
-                    ? currentMethod(loc).name
-                    : methodById(Store.s('method')).name),
+                subtitle: Text(
+                  loc != null
+                      ? currentMethod(loc).name
+                      : methodById(Store.s('method')).name,
+                ),
                 onTap: () => _pickMethod(context),
               ),
               ListTile(
@@ -206,7 +236,9 @@ class SettingsPage extends StatelessWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const SalawatSettingsPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const SalawatSettingsPage(),
+                  ),
                 ),
               ),
 
@@ -232,7 +264,8 @@ class SettingsPage extends StatelessWidget {
                 onTap: () {
                   Clipboard.setData(const ClipboardData(text: sourceUrl));
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم نسخ الرابط')));
+                    const SnackBar(content: Text('تم نسخ الرابط')),
+                  );
                 },
               ),
               ListTile(
@@ -242,14 +275,16 @@ class SettingsPage extends StatelessWidget {
                 onTap: () {
                   Clipboard.setData(const ClipboardData(text: sponsorUrl));
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('تم نسخ رابط الدعم')));
+                    const SnackBar(content: Text('تم نسخ رابط الدعم')),
+                  );
                 },
               ),
               const ListTile(
                 title: Text('مصدر المحتوى'),
                 subtitle: Text(
-                    'نصوص الأذكار من كتب الحديث المشهورة، وهي ملكية عامة، مع تخريج كل ذكر. '
-                    'الخطوط العربية برخصة SIL Open Font License.'),
+                  'نصوص الأذكار من كتب الحديث المشهورة، وهي ملكية عامة، مع تخريج كل ذكر. '
+                  'الخطوط العربية برخصة SIL Open Font License.',
+                ),
               ),
             ],
           ),
@@ -259,85 +294,87 @@ class SettingsPage extends StatelessWidget {
   }
 
   void _pickAccent(BuildContext context, int current) => showModalBottomSheet(
-        context: context,
-        builder: (sheet) => SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final c in WaZaqerTheme.accents)
-                  InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {
-                      Navigator.pop(sheet);
-                      _set(Store.setI('accent', c.toARGB32()));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          width: 3,
-                          color: c.toARGB32() == current
-                              ? Theme.of(context).colorScheme.onSurface
-                              : Colors.transparent,
-                        ),
-                      ),
-                      child: CircleAvatar(radius: 22, backgroundColor: c),
+    context: context,
+    builder: (sheet) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          alignment: WrapAlignment.center,
+          children: [
+            for (final c in WaZaqerTheme.accents)
+              InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () {
+                  Navigator.pop(sheet);
+                  _set(Store.setI('accent', c.toARGB32()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 3,
+                      color: c.toARGB32() == current
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Colors.transparent,
                     ),
                   ),
-              ],
-            ),
-          ),
+                  child: CircleAvatar(radius: 22, backgroundColor: c),
+                ),
+              ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   void _pickFont(BuildContext context, String current) => showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (sheet) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              for (final f in fontFamilies)
-                ListTile(
-                  title: Text('بسم الله الرحمن الرحيم',
-                      style: TextStyle(fontFamily: f, fontSize: 22)),
-                  subtitle: Text(f),
-                  trailing: f == current ? const Icon(Icons.check) : null,
-                  onTap: () {
-                    Navigator.pop(sheet);
-                    _set(Store.setS('fontFamily', f));
-                  },
-                ),
-            ],
-          ),
-        ),
-      );
+    context: context,
+    isScrollControlled: true,
+    builder: (sheet) => SafeArea(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          for (final f in fontFamilies)
+            ListTile(
+              title: Text(
+                'بسم الله الرحمن الرحيم',
+                style: TextStyle(fontFamily: f, fontSize: 22),
+              ),
+              subtitle: Text(f),
+              trailing: f == current ? const Icon(Icons.check) : null,
+              onTap: () {
+                Navigator.pop(sheet);
+                _set(Store.setS('fontFamily', f));
+              },
+            ),
+        ],
+      ),
+    ),
+  );
 
   void _pickMethod(BuildContext context) => showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (sheet) => SafeArea(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              for (final m in methods)
-                ListTile(
-                  title: Text(m.name),
-                  trailing: m.id == methodById(Store.s('method')).id
-                      ? const Icon(Icons.check)
-                      : null,
-                  onTap: () {
-                    Navigator.pop(sheet);
-                    _set(Store.setS('method', m.id), reschedule: true);
-                  },
-                ),
-            ],
-          ),
-        ),
-      );
+    context: context,
+    isScrollControlled: true,
+    builder: (sheet) => SafeArea(
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          for (final m in methods)
+            ListTile(
+              title: Text(m.name),
+              trailing: m.id == methodById(Store.s('method')).id
+                  ? const Icon(Icons.check)
+                  : null,
+              onTap: () {
+                Navigator.pop(sheet);
+                _set(Store.setS('method', m.id), reschedule: true);
+              },
+            ),
+        ],
+      ),
+    ),
+  );
 }

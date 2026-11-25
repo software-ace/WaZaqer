@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'adhkar.dart';
 import 'app_shell.dart';
@@ -39,8 +38,9 @@ class WaZaqerApp extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: Store.rev,
       builder: (context, _, _) {
-        final seed =
-            Color(Store.i('accent', def: WaZaqerTheme.seed.toARGB32()));
+        final seed = Color(
+          Store.i('accent', def: WaZaqerTheme.seed.toARGB32()),
+        );
         return MaterialApp(
           navigatorKey: _navigator,
           title: 'وَذَكِر',
@@ -48,11 +48,9 @@ class WaZaqerApp extends StatelessWidget {
           darkTheme: WaZaqerTheme.of(seed, Brightness.dark),
           // stored 0/1/2 = ThemeMode.system/light/dark
           themeMode: ThemeMode.values[Store.i('themeMode')],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          // .delegates (plural) includes GlobalWidgetsLocalizations, which
+          // supplies the RTL text direction for Arabic; .delegate alone is LTR
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
           supportedLocales: const [Locale('ar'), Locale('en')],
           // Arabic first, English as secondary locale.
           localeResolutionCallback: (locale, supported) => supported.first,
