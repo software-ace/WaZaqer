@@ -1,5 +1,31 @@
 import 'package:material_ui/material_ui.dart';
 
+/// The app's mark: «و» in gold on the icon's navy, for desktop and web bars.
+class AppMark extends StatelessWidget {
+  const AppMark({super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 40,
+    height: 40,
+    alignment: Alignment.center,
+    decoration: BoxDecoration(
+      color: const Color(0xFF011D28),
+      borderRadius: BorderRadius.circular(11),
+      border: Border.all(color: const Color(0xFFB8964A)),
+    ),
+    child: const Text(
+      'و',
+      style: TextStyle(
+        fontFamily: 'Noto Naskh Arabic',
+        color: Color(0xFFE8D7A8),
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
+
 /// Gradient band behind header content.
 class HeaderGradient extends StatelessWidget {
   const HeaderGradient({super.key, required this.child, this.padding});

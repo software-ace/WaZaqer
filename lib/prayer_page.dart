@@ -7,6 +7,23 @@ import 'location.dart';
 import 'prayer.dart';
 import 'store.dart';
 
+/// Times to show at [now] and the index of the next prayer in them.
+/// Sunrise (index 1) is not a prayer. After isha: tomorrow, fajr next.
+(PrayerTimes, int) upcomingPrayers(SavedLocation loc, DateTime now) {
+  final method = currentMethod(loc);
+  final times = prayerTimes(now, loc.lat, loc.lng, method);
+  final next = [
+    0,
+    2,
+    3,
+    4,
+    5,
+  ].where((i) => times.all[i].isAfter(now)).firstOrNull;
+  if (next != null) return (times, next);
+  final tomorrow = DateTime(now.year, now.month, now.day + 1);
+  return (prayerTimes(tomorrow, loc.lat, loc.lng, method), 0);
+}
+
 /// Today's five prayers plus sunrise, the next prayer highlighted.
 /// After isha it shows tomorrow, with fajr as next.
 class PrayerTimesPage extends StatelessWidget {
@@ -48,15 +65,7 @@ class PrayerTimesPage extends StatelessWidget {
   Widget _table(BuildContext context, SavedLocation loc, bool arabic) {
     final scheme = Theme.of(context).colorScheme;
     final method = currentMethod(loc);
-    final now = DateTime.now();
-    var times = prayerTimes(now, loc.lat, loc.lng, method);
-    // next prayer: sunrise (index 1) is not a prayer
-    var next = [0, 2, 3, 4, 5].where((i) => times.all[i].isAfter(now)).firstOrNull;
-    if (next == null) {
-      times = prayerTimes(
-          DateTime(now.year, now.month, now.day + 1), loc.lat, loc.lng, method);
-      next = 0;
-    }
+    final (times, next) = upcomingPrayers(loc, DateTime.now());
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -85,9 +94,7 @@ class PrayerTimesPage extends StatelessWidget {
         Text(
           'طريقة الحساب: ${method.name}',
           textAlign: TextAlign.center,
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
+          style: Theme.of(context).textTheme.bodySmall
               ?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],

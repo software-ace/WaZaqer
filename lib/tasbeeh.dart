@@ -31,41 +31,27 @@ class TasbeehState {
     // A new round starts at 0; cycles keep, they count finished rounds.
     count = 0;
   }
-}
 
-class TasbeehPage extends StatefulWidget {
-  const TasbeehPage({super.key});
-
-  @override
-  State<TasbeehPage> createState() => _TasbeehPageState();
-}
-
-class _TasbeehPageState extends State<TasbeehPage> {
-  final _st = TasbeehState(
-    count: Store.i('tasbeehCount'),
-    cycles: Store.i('tasbeehCycles'),
-    target: () {
-      final t = Store.i('tasbeehTarget', def: 33);
-      return t == 0 ? null : t;
-    }(),
-  );
-
-  void _save() {
-    Store.setI('tasbeehCount', _st.count);
-    Store.setI('tasbeehCycles', _st.cycles);
-    Store.setI('tasbeehTarget', _st.target ?? 0);
+  /// The saved counter; target 0 in Store means unlimited.
+  static TasbeehState load() {
+    final t = Store.i('tasbeehTarget', def: 33);
+    return TasbeehState(
+      count: Store.i('tasbeehCount'),
+      cycles: Store.i('tasbeehCycles'),
+      target: t == 0 ? null : t,
+    );
   }
 
-  void _tap() {
-    setState(_st.tap);
-    // Heavy on cycle completion so wrapping is felt, light on every other tap.
-    HapticFeedback.lightImpact();
-    if (_st.count == 0 && _st.cycles > 0) HapticFeedback.heavyImpact();
-    _save();
+  void save() {
+    Store.setI('tasbeehCount', count);
+    Store.setI('tasbeehCycles', cycles);
+    Store.setI('tasbeehTarget', target ?? 0);
   }
+}
 
-  Future<void> _reset() async {
-    final ok = await showDialog<bool>(
+/// Asks before zeroing the count and cycles.
+Future<bool> confirmTasbeehReset(BuildContext context) async =>
+    await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('إعادة الضبط؟'),
@@ -81,8 +67,31 @@ class _TasbeehPageState extends State<TasbeehPage> {
           ),
         ],
       ),
-    );
-    if (ok == true) {
+    ) ==
+    true;
+
+class TasbeehPage extends StatefulWidget {
+  const TasbeehPage({super.key});
+
+  @override
+  State<TasbeehPage> createState() => _TasbeehPageState();
+}
+
+class _TasbeehPageState extends State<TasbeehPage> {
+  final _st = TasbeehState.load();
+
+  void _save() => _st.save();
+
+  void _tap() {
+    setState(_st.tap);
+    // Heavy on cycle completion so wrapping is felt, light on every other tap.
+    HapticFeedback.lightImpact();
+    if (_st.count == 0 && _st.cycles > 0) HapticFeedback.heavyImpact();
+    _save();
+  }
+
+  Future<void> _reset() async {
+    if (await confirmTasbeehReset(context)) {
       setState(() {
         _st.count = 0;
         _st.cycles = 0;

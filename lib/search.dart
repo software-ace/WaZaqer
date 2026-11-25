@@ -8,6 +8,23 @@ import 'store.dart';
 /// Search across every group in [data]. Title matches come first, marked
 /// «في العنوان»; text-only matches follow, marked «في النص».
 /// Matching is tashkeel-insensitive and ignores hamza/alef variants.
+/// Groups matching [query], title hits first, then groups whose text
+/// matches; each entry carries true for a title match. Empty query → none.
+List<(DhikrGroup, bool)> searchGroups(AdhkarData data, String query) {
+  final q = searchKey(query);
+  if (q.isEmpty) return [];
+  final titleHits = <(DhikrGroup, bool)>[];
+  final textHits = <(DhikrGroup, bool)>[];
+  for (final g in data.groups) {
+    if (searchKey(g.title).contains(q)) {
+      titleHits.add((g, true));
+    } else if (g.items.any((i) => searchKey(i.text).contains(q))) {
+      textHits.add((g, false));
+    }
+  }
+  return [...titleHits, ...textHits];
+}
+
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key, required this.data});
 
@@ -27,21 +44,7 @@ class _SearchPageState extends State<SearchPage> {
     await saved;
   }
 
-  // Title-matching groups first, then the rest; each entry carries its match tag.
-  List<(DhikrGroup, bool)> get _results {
-    final q = searchKey(_query);
-    if (q.isEmpty) return [];
-    final titleHits = <(DhikrGroup, bool)>[];
-    final textHits = <(DhikrGroup, bool)>[];
-    for (final g in widget.data.groups) {
-      if (searchKey(g.title).contains(q)) {
-        titleHits.add((g, true));
-      } else if (g.items.any((i) => searchKey(i.text).contains(q))) {
-        textHits.add((g, false));
-      }
-    }
-    return [...titleHits, ...textHits];
-  }
+  List<(DhikrGroup, bool)> get _results => searchGroups(widget.data, _query);
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,29 @@
-import 'dart:convert';
-
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'adhkar.dart';
 import 'digits.dart';
+import 'reader_controller.dart';
 import 'reminders.dart';
 import 'store.dart';
+
+/// Shares what [c] shows: the current dhikr, or on the done page the whole
+/// group. A snackbar says so where the platform can't share.
+void shareReading(BuildContext context, ReaderController c) {
+  try {
+    SharePlus.instance.share(
+      ShareParams(
+        text: '${c.group.title}\n\n${c.shareText}',
+        title: c.group.title,
+      ),
+    );
+  } on Exception {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('المشاركة غير مدعومة')));
+  }
+}
 
 /// Paged dhikr reader: one dhikr per card, a built-in tap counter with a
 /// progress ring, auto-advance, persisted per-group progress, and a
@@ -33,90 +48,43 @@ class ReaderPage extends StatefulWidget {
 }
 
 class _ReaderPageState extends State<ReaderPage> {
-  late List<int> _counts;
-  late int _index;
-  late final PageController _controller;
+  late final _c = ReaderController(
+    widget.group,
+    restartIfDone: widget.restartIfDone,
+  )..addListener(_changed);
+  late final _controller = PageController(initialPage: _c.index);
 
   @override
   void initState() {
     super.initState();
-    final saved = Store.s('prog:${widget.group.id}');
-    if (saved != null) {
-      final j = jsonDecode(saved) as Map<String, dynamic>;
-      _counts = [for (final c in (j['c'] as List)) c as int];
-      final i = j['i'] as int;
-      final done =
-          i >= widget.group.items.length || _counts.every((c) => c > 0);
-      // a finished group reopens on the done page, unless asked to restart
-      _index = done
-          ? widget.group.items.length
-          : i.clamp(0, widget.group.items.length - 1);
-    }
-    if (saved == null ||
-        (widget.restartIfDone && _index == widget.group.items.length)) {
-      _index = 0;
-      _counts = [for (final _ in widget.group.items) 0];
-    }
-    _controller = PageController(initialPage: _index);
-    _wake(true);
+    keepAwake(true);
   }
 
   @override
   void dispose() {
-    _wake(false);
+    keepAwake(false);
+    _c.dispose();
     _controller.dispose();
     super.dispose();
   }
 
-  Future<void> _wake(bool on) async {
-    if (Store.b('keepAwake', def: true)) {
-      try {
-        await WakelockPlus.toggle(enable: on);
-      } catch (_) {
-        // keep-awake is a nicety; unsupported platforms (web throws a JS
-        // error, not an Exception) stay silent
-      }
-    }
-  }
-
-  void _persist() => Store.setS(
-    'prog:${widget.group.id}',
-    jsonEncode({'i': _index, 'c': _counts}),
-  );
-
-  DhikrItem get _item => widget.group.items[_index];
+  void _changed() => setState(() {});
 
   void _increment() {
-    // a finished card (revisited by swiping back) just moves on
-    if (_counts[_index] >= _item.count) return _advance();
-    if (Store.b('haptics', def: true)) HapticFeedback.lightImpact();
-    if (Store.b('sound', def: false)) SystemSound.play(SystemSoundType.click);
-    setState(() {
-      _counts[_index]++;
-      _persist();
-      if (_counts[_index] >= _item.count && Store.b('autoAdvance', def: true)) {
-        _advance();
-      }
-    });
+    if (_c.tap()) _advance();
   }
 
+  // moves by animating the pager; onPageChanged then tells the controller
   void _advance() {
-    if (_index < widget.group.items.length - 1) {
+    if (_c.index < _c.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
     } else {
-      _controller.jumpToPage(widget.group.items.length);
+      _controller.jumpToPage(_c.length);
     }
   }
-
-  /// Leaving mid-way through a multi-dhikr group asks first, so a stray
-  /// back tap doesn't drop the reader out of the flow.
-  bool get _confirmLeave =>
-      widget.group.items.length > 1 &&
-      _index < widget.group.items.length &&
-      _counts.any((c) => c > 0);
 
   Future<void> _askLeave() async {
     final leave = await showDialog<bool>(
@@ -142,44 +110,14 @@ class _ReaderPageState extends State<ReaderPage> {
   }
 
   void _reset() {
-    setState(() {
-      _index = 0;
-      _counts = [for (final _ in widget.group.items) 0];
-      _persist();
-      _controller.jumpToPage(0);
-    });
+    _c.reset();
+    _controller.jumpToPage(0);
   }
-
-  String _itemText(DhikrItem item) => [
-    item.text,
-    if (item.note.isNotEmpty) item.note,
-    if (item.source.isNotEmpty) item.source,
-  ].join('\n\n');
-
-  /// The current dhikr, or on the done page (one past the last item, so
-  /// there's no single dhikr) the whole group.
-  String get _shareText => _index < widget.group.items.length
-      ? _itemText(widget.group.items[_index])
-      : widget.group.items.map(_itemText).join('\n\n* * *\n\n');
 
   void _copy() {
-    Clipboard.setData(ClipboardData(text: _shareText));
+    Clipboard.setData(ClipboardData(text: _c.shareText));
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('تم النسخ')));
-  }
-
-  void _share() {
-    try {
-      SharePlus.instance.share(
-        ShareParams(
-          text: '${widget.group.title}\n\n$_shareText',
-          title: widget.group.title,
-        ),
-      );
-    } on Exception {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('المشاركة غير مدعومة')));
-    }
   }
 
   void _reminders() => showReminderSheet(context, widget.group);
@@ -190,7 +128,7 @@ class _ReaderPageState extends State<ReaderPage> {
     final arabic = Store.b('arabicDigits', def: true);
     // PopScope covers the app bar arrow, system back and the back gesture
     return PopScope(
-      canPop: !_confirmLeave,
+      canPop: !_c.confirmLeave,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _askLeave();
       },
@@ -199,7 +137,7 @@ class _ReaderPageState extends State<ReaderPage> {
         // the title lives in the body box below: long titles were truncated here
         appBar: AppBar(
           actions: [
-            IconButton(icon: const Icon(Icons.share), onPressed: _share),
+            IconButton(icon: const Icon(Icons.share), onPressed: () => shareReading(context, _c)),
             IconButton(icon: const Icon(Icons.copy), onPressed: _copy),
             IconButton(
               icon: const Icon(Icons.notifications_none),
@@ -215,10 +153,7 @@ class _ReaderPageState extends State<ReaderPage> {
               child: PageView.builder(
                 controller: _controller,
                 itemCount: widget.group.items.length + 1,
-                onPageChanged: (i) => setState(() {
-                  _index = i;
-                  _persist();
-                }),
+                onPageChanged: _c.goTo,
                 itemBuilder: (context, i) => i < widget.group.items.length
                     ? _buildDhikr(context, scheme, arabic, i)
                     : _buildDone(context, scheme),
@@ -231,7 +166,7 @@ class _ReaderPageState extends State<ReaderPage> {
   }
 
   // pages render by their own index: PageView builds neighbours mid-jump,
-  // when _index may already sit on another page
+  // when _c.index may already sit on another page
   Widget _buildDhikr(
     BuildContext context,
     ColorScheme scheme,
@@ -308,7 +243,7 @@ class _ReaderPageState extends State<ReaderPage> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               _Counter(
-                done: _counts[i],
+                done: _c.counts[i],
                 total: item.count,
                 arabic: arabic,
                 onTap: _increment,

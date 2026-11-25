@@ -80,9 +80,7 @@ class _QiblaPageState extends State<QiblaPage> {
     final live = _haveHeading && !_noSensor;
     final diff = ((bearing - heading) % 360 + 360) % 360;
     final aligned = live && (diff < 5 || diff > 355);
-    final muted = Theme.of(context)
-        .textTheme
-        .bodySmall
+    final muted = Theme.of(context).textTheme.bodySmall
         ?.copyWith(color: scheme.onSurfaceVariant);
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -105,7 +103,7 @@ class _QiblaPageState extends State<QiblaPage> {
                   angle: live ? -heading * pi / 180 : 0,
                   child: CustomPaint(
                     size: const Size.square(260),
-                    painter: _DialPainter(scheme),
+                    painter: QiblaDialPainter(scheme),
                   ),
                 ),
                 Transform.rotate(
@@ -123,9 +121,14 @@ class _QiblaPageState extends State<QiblaPage> {
         ),
         const SizedBox(height: 24),
         if (aligned)
-          Text('أنت متجه نحو القبلة',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: scheme.primary, fontWeight: FontWeight.bold)),
+          Text(
+            'أنت متجه نحو القبلة',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: scheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         Text(
           live
               ? 'ضع الهاتف بشكل مسطح، وإن بدا الاتجاه غير دقيق فحرّكه على شكل الرقم ٨ لمعايرة البوصلة'
@@ -138,8 +141,8 @@ class _QiblaPageState extends State<QiblaPage> {
   }
 }
 
-class _DialPainter extends CustomPainter {
-  _DialPainter(this.scheme);
+class QiblaDialPainter extends CustomPainter {
+  QiblaDialPainter(this.scheme);
 
   final ColorScheme scheme;
 
@@ -177,5 +180,5 @@ class _DialPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DialPainter old) => old.scheme != scheme;
+  bool shouldRepaint(covariant QiblaDialPainter old) => old.scheme != scheme;
 }

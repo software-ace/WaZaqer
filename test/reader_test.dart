@@ -206,4 +206,33 @@ void main() {
     await tester.pumpWidget(_page());
     expect(find.text('أصبحنا وأصبح الملك لله'), findsOneWidget);
   });
+
+  testWidgets('every dhikr started but not finished reopens where it was', (
+    tester,
+  ) async {
+    // the first needs 3 and has 1: the group is not finished
+    SharedPreferences.setMockInitialValues({
+      'flutter.prog:g1': '{"i":1,"c":[1,1]}',
+    });
+    await Store.init();
+    await tester.pumpWidget(_page());
+    expect(find.text('أتممت الذكر'), findsNothing);
+    expect(find.text('اللهم بك أصبحنا'), findsOneWidget);
+  });
+
+  testWidgets('saved progress shorter than the group still opens', (
+    tester,
+  ) async {
+    // saved before the group had its second dhikr
+    SharedPreferences.setMockInitialValues({
+      'flutter.prog:g1': '{"i":0,"c":[2]}',
+    });
+    await Store.init();
+    await tester.pumpWidget(_page());
+    expect(tester.takeException(), isNull);
+    expect(find.text('٢'), findsOneWidget);
+    await tester.tap(find.text('أصبحنا وأصبح الملكُ لله'));
+    await tester.pumpAndSettle();
+    expect(Store.s('prog:g1'), contains('"c":[3,0]'));
+  });
 }
