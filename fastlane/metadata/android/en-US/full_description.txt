@@ -1,7 +1,11 @@
-WaZaqer is a free and open-source app for daily adhkar (remembrance of Allah).
+WaZaqer (وَذَكِر) is a free and open-source app for daily adhkar (remembrance of Allah), Arabic-first and right to left throughout.
 
-It gathers the daily azkar in one clean place: after prayer, morning azkar, evening azkar, and the azkar of sleep. Each dhikr shows the number of times to repeat it, and you mark each repetition as you go.
+• Adhkar: 135 groups in 11 categories, from after prayer, morning, evening and sleep to home, travel, food, illness and more. Every dhikr shows its source (takhrij). Favourites, and a search that ignores tashkeel.
+• Reader: one dhikr per page with a counter that moves on when the count is reached and remembers where you stopped.
+• Tasbeeh: tap anywhere to count, with 33, 100 or unlimited targets and a cycle counter.
+• Prayer times: calculated on the device, with 13 methods or automatic choice by region.
+• Qibla: a compass from the phone's sensor.
+• Reminders: per group, salawat through the day, and optional adhan, all with the system sound.
+• Settings: accent colour, light and dark theme, Arabic or Latin digits, tashkeel on or off, six Arabic fonts and font size.
 
-WaZaqer is built with Flutter and is free software: you can read, change and share the code.
-
-This app is under active development; more collections and features are on the way.
+No ads, no analytics, no accounts and no internet permission: everything stays on your device. Location is used only for prayer times and the Qibla, only when you ask for it, and you can pick a city instead.
