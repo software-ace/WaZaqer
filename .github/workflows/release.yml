@@ -219,3 +219,43 @@ jobs:
   build-windows:
     needs: build-apk
     uses: ./.github/workflows/windows.yml
+
+  # The web build on GitHub Pages (https://software-ace.github.io/WaZaqer/),
+  # replaced by each release tag. Pages serves it under /WaZaqer/, hence the
+  # base href; the app's #/ addresses need no server-side routing. Needs
+  # Pages set to "GitHub Actions" and v* tags allowed in the github-pages
+  # environment (repo settings).
+  deploy-web:
+    needs: build-apk
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # one deployment at a time; a newer tag waits rather than cancelling
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: pubspec.yaml
+
+      # --no-web-resources-cdn bundles Flutter's renderer and fonts, so the
+      # site loads nothing from other servers (Flutter's default is Google's)
+      - name: Build web
+        run: flutter build web --release --no-web-resources-cdn --base-href /WaZaqer/
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: build/web
+
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
