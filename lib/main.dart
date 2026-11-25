@@ -18,14 +18,16 @@ void main() async {
   Reminders.init(_openGroup);
 }
 
-/// A tapped reminder opens its group's reader.
+/// A tapped reminder opens its group's reader, restarting it if finished.
 Future<void> _openGroup(String id) async {
   final data = await AdhkarData.load();
   final group = data.groups.where((g) => g.id == id).firstOrNull;
   if (group == null) return;
   await WidgetsBinding.instance.endOfFrame;
   _navigator.currentState?.push(
-    MaterialPageRoute(builder: (_) => ReaderPage(group: group)),
+    MaterialPageRoute(
+      builder: (_) => ReaderPage(group: group, restartIfDone: true),
+    ),
   );
 }
 

@@ -16,9 +16,17 @@ import 'store.dart';
 ///
 /// Settings are read from Store with the same defaults as the settings page.
 class ReaderPage extends StatefulWidget {
-  const ReaderPage({super.key, required this.group});
+  const ReaderPage({
+    super.key,
+    required this.group,
+    this.restartIfDone = false,
+  });
 
   final DhikrGroup group;
+
+  /// Start a finished group over instead of showing its done page. Set when
+  /// a reminder opens the group: the reminder asks for a fresh reading.
+  final bool restartIfDone;
 
   @override
   State<ReaderPage> createState() => _ReaderPageState();
@@ -37,12 +45,15 @@ class _ReaderPageState extends State<ReaderPage> {
       final j = jsonDecode(saved) as Map<String, dynamic>;
       _counts = [for (final c in (j['c'] as List)) c as int];
       final i = j['i'] as int;
-      // a finished group reopens on the done page
-      _index = i >= widget.group.items.length ||
-              _counts.every((c) => c > 0)
+      final done =
+          i >= widget.group.items.length || _counts.every((c) => c > 0);
+      // a finished group reopens on the done page, unless asked to restart
+      _index = done
           ? widget.group.items.length
           : i.clamp(0, widget.group.items.length - 1);
-    } else {
+    }
+    if (saved == null ||
+        (widget.restartIfDone && _index == widget.group.items.length)) {
       _index = 0;
       _counts = [for (final _ in widget.group.items) 0];
     }
@@ -68,28 +79,65 @@ class _ReaderPageState extends State<ReaderPage> {
   }
 
   void _persist() => Store.setS(
-      'prog:${widget.group.id}', jsonEncode({'i': _index, 'c': _counts}));
+    'prog:${widget.group.id}',
+    jsonEncode({'i': _index, 'c': _counts}),
+  );
 
   DhikrItem get _item => widget.group.items[_index];
 
   void _increment() {
-    if (_counts[_index] >= _item.count) return;
+    // a finished card (revisited by swiping back) just moves on
+    if (_counts[_index] >= _item.count) return _advance();
     if (Store.b('haptics', def: true)) HapticFeedback.lightImpact();
     if (Store.b('sound', def: false)) SystemSound.play(SystemSoundType.click);
     setState(() {
       _counts[_index]++;
       _persist();
       if (_counts[_index] >= _item.count && Store.b('autoAdvance', def: true)) {
-        if (_index < widget.group.items.length - 1) {
-          _controller.nextPage(
-            duration: const Duration(milliseconds: 350),
-            curve: Curves.easeInOut,
-          );
-        } else {
-          _controller.jumpToPage(widget.group.items.length);
-        }
+        _advance();
       }
     });
+  }
+
+  void _advance() {
+    if (_index < widget.group.items.length - 1) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _controller.jumpToPage(widget.group.items.length);
+    }
+  }
+
+  /// Leaving mid-way through a multi-dhikr group asks first, so a stray
+  /// back tap doesn't drop the reader out of the flow.
+  bool get _confirmLeave =>
+      widget.group.items.length > 1 &&
+      _index < widget.group.items.length &&
+      _counts.any((c) => c > 0);
+
+  Future<void> _askLeave() async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('الخروج من الأذكار؟'),
+        content: const Text(
+          'لم تُكمل الأذكار بعد. تقدّمك محفوظ ويمكنك المتابعة لاحقًا.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('متابعة'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('خروج'),
+          ),
+        ],
+      ),
+    );
+    if (leave == true && mounted) Navigator.pop(context);
   }
 
   void _reset() {
@@ -101,30 +149,31 @@ class _ReaderPageState extends State<ReaderPage> {
     });
   }
 
+  String _itemText(DhikrItem item) => [
+    item.text,
+    if (item.note.isNotEmpty) item.note,
+    if (item.source.isNotEmpty) item.source,
+  ].join('\n\n');
+
+  /// The current dhikr, or on the done page (one past the last item, so
+  /// there's no single dhikr) the whole group.
+  String get _shareText => _index < widget.group.items.length
+      ? _itemText(widget.group.items[_index])
+      : widget.group.items.map(_itemText).join('\n\n* * *\n\n');
+
   void _copy() {
-    final item = widget.group.items[_index];
-    Clipboard.setData(ClipboardData(
-      text: [
-        item.text,
-        if (item.note.isNotEmpty) item.note,
-        if (item.source.isNotEmpty) item.source,
-      ].join('\n\n'),
-    ));
+    Clipboard.setData(ClipboardData(text: _shareText));
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('تم النسخ')));
   }
 
   void _share() {
-    final item = widget.group.items[_index];
-    final text = [
-      item.text,
-      if (item.note.isNotEmpty) item.note,
-      if (item.source.isNotEmpty) item.source,
-    ].join('\n\n');
     try {
       SharePlus.instance.share(
-        ShareParams(text: '${widget.group.title}\n\n$text',
-            title: widget.group.title),
+        ShareParams(
+          text: '${widget.group.title}\n\n$_shareText',
+          title: widget.group.title,
+        ),
       );
     } on Exception {
       ScaffoldMessenger.of(context)
@@ -138,32 +187,44 @@ class _ReaderPageState extends State<ReaderPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final arabic = Store.b('arabicDigits', def: true);
-    return Scaffold(
-      backgroundColor: scheme.surface,
-      appBar: AppBar(
-        title: Text(widget.group.title),
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.share), onPressed: _share),
-          IconButton(
-              icon: const Icon(Icons.copy), onPressed: _copy),
-          IconButton(
+    // PopScope covers the app bar arrow, system back and the back gesture
+    return PopScope(
+      canPop: !_confirmLeave,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _askLeave();
+      },
+      child: Scaffold(
+        backgroundColor: scheme.surface,
+        // the title lives in the body box below: long titles were truncated here
+        appBar: AppBar(
+          actions: [
+            IconButton(icon: const Icon(Icons.share), onPressed: _share),
+            IconButton(icon: const Icon(Icons.copy), onPressed: _copy),
+            IconButton(
               icon: const Icon(Icons.notifications_none),
-              onPressed: _reminders),
-          IconButton(
-              icon: const Icon(Icons.restart_alt), onPressed: _reset),
-        ],
-      ),
-      body: PageView.builder(
-        controller: _controller,
-        itemCount: widget.group.items.length + 1,
-        onPageChanged: (i) => setState(() {
-          _index = i;
-          _persist();
-        }),
-        itemBuilder: (context, i) => i < widget.group.items.length
-            ? _buildDhikr(context, scheme, arabic, i)
-            : _buildDone(context, scheme),
+              onPressed: _reminders,
+            ),
+            IconButton(icon: const Icon(Icons.restart_alt), onPressed: _reset),
+          ],
+        ),
+        body: Column(
+          children: [
+            _TitleBox(title: widget.group.title),
+            Expanded(
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: widget.group.items.length + 1,
+                onPageChanged: (i) => setState(() {
+                  _index = i;
+                  _persist();
+                }),
+                itemBuilder: (context, i) => i < widget.group.items.length
+                    ? _buildDhikr(context, scheme, arabic, i)
+                    : _buildDone(context, scheme),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -171,7 +232,11 @@ class _ReaderPageState extends State<ReaderPage> {
   // pages render by their own index: PageView builds neighbours mid-jump,
   // when _index may already sit on another page
   Widget _buildDhikr(
-      BuildContext context, ColorScheme scheme, bool arabic, int i) {
+    BuildContext context,
+    ColorScheme scheme,
+    bool arabic,
+    int i,
+  ) {
     final item = widget.group.items[i];
     final text = Store.b('tashkeel', def: true)
         ? item.text
@@ -180,16 +245,17 @@ class _ReaderPageState extends State<ReaderPage> {
     final fontSize = 26 * Store.i('fontScale', def: 100) / 100;
     final fontFamily = Store.s('fontFamily');
     final style = Theme.of(context).textTheme.titleLarge!.copyWith(
-          fontSize: fontSize,
-          height: 1.9,
-          fontFamily:
-              (fontFamily != null && fontFamily.isNotEmpty) ? fontFamily : null,
-        );
+      fontSize: fontSize,
+      height: 1.9,
+      fontFamily: (fontFamily != null && fontFamily.isNotEmpty)
+          ? fontFamily
+          : null,
+    );
     return Column(
       children: [
         Expanded(
           child: Card(
-            margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            margin: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             child: InkWell(
               borderRadius: const BorderRadius.all(Radius.circular(16)),
               onTap: _increment,
@@ -201,14 +267,21 @@ class _ReaderPageState extends State<ReaderPage> {
                       Text(text, style: style, textAlign: TextAlign.center),
                       if (item.note.isNotEmpty || item.source.isNotEmpty) ...[
                         const SizedBox(height: 16),
-                        Row(children: [
-                          const Expanded(
-                              child: Divider(indent: 8, endIndent: 8)),
-                          Icon(Icons.menu_book,
-                              size: 16, color: scheme.onSurfaceVariant),
-                          const Expanded(
-                              child: Divider(indent: 8, endIndent: 8)),
-                        ]),
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: Divider(indent: 8, endIndent: 8),
+                            ),
+                            Icon(
+                              Icons.menu_book,
+                              size: 16,
+                              color: scheme.onSurfaceVariant,
+                            ),
+                            const Expanded(
+                              child: Divider(indent: 8, endIndent: 8),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           item.source.isNotEmpty ? item.source : item.note,
@@ -229,17 +302,21 @@ class _ReaderPageState extends State<ReaderPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(repeatLabel(item.count, arabicDigits: arabic),
-                  style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                repeatLabel(item.count, arabicDigits: arabic),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               _Counter(
                 done: _counts[i],
                 total: item.count,
                 arabic: arabic,
                 onTap: _increment,
               ),
-              Text('${digits(i + 1, arabic: arabic)} / '
-                  '${digits(widget.group.items.length, arabic: arabic)}',
-                  style: Theme.of(context).textTheme.bodySmall),
+              Text(
+                '${digits(i + 1, arabic: arabic)} / '
+                '${digits(widget.group.items.length, arabic: arabic)}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
           ),
         ),
@@ -258,9 +335,7 @@ class _ReaderPageState extends State<ReaderPage> {
           const SizedBox(height: 8),
           Text(
             widget.group.title,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
+            style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
@@ -274,6 +349,35 @@ class _ReaderPageState extends State<ReaderPage> {
             child: const Text('رجوع'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Group title above the dhikr card; wraps instead of truncating.
+class _TitleBox extends StatelessWidget {
+  const _TitleBox({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: scheme.onPrimaryContainer,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
