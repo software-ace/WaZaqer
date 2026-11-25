@@ -28,4 +28,15 @@ class Store {
   static Future<void> setList(String k, List<String> v) =>
       _p.setStringList(k, v);
   static Future<void> remove(String k) => _p.remove(k);
+
+  /// Bumped by [toggleFavourite], so screens showing favourites elsewhere
+  /// (the home tile's count) update when a heart is toggled.
+  static final favRev = ValueNotifier(0);
+
+  /// Flips [id] in the caller's [favs] list (its on-screen copy), saves it.
+  static Future<void> toggleFavourite(List<String> favs, String id) async {
+    favs.contains(id) ? favs.remove(id) : favs.add(id);
+    await setList('favourites', favs);
+    favRev.value++;
+  }
 }

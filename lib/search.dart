@@ -22,10 +22,9 @@ class _SearchPageState extends State<SearchPage> {
   final List<String> _favs = Store.list('favourites');
 
   Future<void> _toggleFav(String id) async {
-    setState(() {
-      _favs.contains(id) ? _favs.remove(id) : _favs.add(id);
-    });
-    await Store.setList('favourites', _favs);
+    final saved = Store.toggleFavourite(_favs, id);
+    setState(() {});
+    await saved;
   }
 
   // Title-matching groups first, then the rest; each entry carries its match tag.

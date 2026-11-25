@@ -25,10 +25,9 @@ class _CategoryPageState extends State<CategoryPage> {
   bool _isFav(String id) => _favs.contains(id);
 
   Future<void> _toggleFav(String id) async {
-    setState(() {
-      _isFav(id) ? _favs.remove(id) : _favs.add(id);
-    });
-    await Store.setList('favourites', _favs);
+    final saved = Store.toggleFavourite(_favs, id);
+    setState(() {});
+    await saved;
   }
 
   late final _iconOf = {

@@ -47,14 +47,12 @@ class _HomePageState extends State<HomePage> {
   AdhkarData? _data;
   bool _salawatFav = false;
   bool _notifCard = true;
-  int _favCount = 0;
 
   @override
   void initState() {
     super.initState();
     _salawatFav = Store.b('salawatFav');
     _notifCard = !Store.b('notifGranted') && !Store.b('notifDismissed');
-    _favCount = Store.list('favourites').length;
     AdhkarData.load().then((d) => setState(() => _data = d));
   }
 
@@ -125,21 +123,20 @@ class _HomePageState extends State<HomePage> {
                                 ),
                             itemCount: data.categories.length + 1,
                             itemBuilder: (context, i) => i == 0
-                                ? _FavTile(
-                                    count: _favCount,
-                                    arabic: arabic,
-                                    onTap: () async {
-                                      await Navigator.push(
+                                // count follows hearts toggled on any screen
+                                ? ValueListenableBuilder(
+                                    valueListenable: Store.favRev,
+                                    builder: (context, _, _) => _FavTile(
+                                      count: Store.list('favourites').length,
+                                      arabic: arabic,
+                                      onTap: () => Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => CategoryPage(
-                                            data: data,
-                                          ),
+                                          builder: (_) =>
+                                              CategoryPage(data: data),
                                         ),
-                                      );
-                                      setState(() => _favCount =
-                                          Store.list('favourites').length);
-                                    },
+                                      ),
+                                    ),
                                   )
                                 : _CategoryTile(
                                     category: data.categories[i - 1],
@@ -157,8 +154,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context, ColorScheme scheme, bool arabic,
-      AdhkarData? data) {
+  Widget _buildHeader(
+    BuildContext context,
+    ColorScheme scheme,
+    bool arabic,
+    AdhkarData? data,
+  ) {
     return HeaderGradient(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
       child: Stack(
@@ -194,11 +195,11 @@ class _HomePageState extends State<HomePage> {
                 onTap: data == null
                     ? null
                     : () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SearchPage(data: data),
-                          ),
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SearchPage(data: data),
                         ),
+                      ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -365,7 +366,9 @@ class _FavTile extends StatelessWidget {
               const Spacer(),
               Text('المفضلة', style: Theme.of(context).textTheme.titleMedium),
               Text(
-                count == 0 ? '—' : adhkarCountLabel(count, arabicDigits: arabic),
+                count == 0
+                    ? '—'
+                    : adhkarCountLabel(count, arabicDigits: arabic),
                 style: Theme.of(context).textTheme.bodySmall
                     ?.copyWith(color: scheme.onSurfaceVariant),
               ),
