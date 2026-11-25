@@ -144,7 +144,12 @@ class _WebShellState extends State<WebShell> {
   Widget build(BuildContext context) {
     final base = Theme.of(context);
     final theme = base.copyWith(
-      textTheme: base.textTheme.apply(fontFamily: 'Tajawal'),
+      // glyphs Tajawal lacks (ﷺ) come from the bundled Naskh, not from the
+      // system or, on web, a font fetched from Google's servers
+      textTheme: base.textTheme.apply(
+        fontFamily: 'Tajawal',
+        fontFamilyFallback: const ['Noto Naskh Arabic'],
+      ),
     );
     return Theme(
       data: theme,

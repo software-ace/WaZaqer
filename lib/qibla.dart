@@ -103,7 +103,10 @@ class _QiblaPageState extends State<QiblaPage> {
                   angle: live ? -heading * pi / 180 : 0,
                   child: CustomPaint(
                     size: const Size.square(260),
-                    painter: QiblaDialPainter(scheme),
+                    painter: QiblaDialPainter(
+                      scheme,
+                      fontFamily: Theme.of(context).textTheme.bodyMedium?.fontFamily,
+                    ),
                   ),
                 ),
                 Transform.rotate(
@@ -142,9 +145,14 @@ class _QiblaPageState extends State<QiblaPage> {
 }
 
 class QiblaDialPainter extends CustomPainter {
-  QiblaDialPainter(this.scheme);
+  QiblaDialPainter(this.scheme, {this.fontFamily});
 
   final ColorScheme scheme;
+
+  /// For the ش ق ج غ labels: a painter sits outside the widget tree's text
+  /// style, so without it they fall back to a system (or, on web, fetched)
+  /// font.
+  final String? fontFamily;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -168,6 +176,7 @@ class QiblaDialPainter extends CustomPainter {
           text: labels[i],
           style: TextStyle(
             color: i == 0 ? scheme.error : scheme.onSurfaceVariant,
+            fontFamily: fontFamily,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -180,5 +189,6 @@ class QiblaDialPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant QiblaDialPainter old) => old.scheme != scheme;
+  bool shouldRepaint(covariant QiblaDialPainter old) =>
+      old.scheme != scheme || old.fontFamily != fontFamily;
 }

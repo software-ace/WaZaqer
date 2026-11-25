@@ -81,7 +81,12 @@ class _DesktopShellState extends State<DesktopShell> {
     final base = Theme.of(context);
     // interface text in Tajawal (bundled); adhkar keep the reading font
     final theme = base.copyWith(
-      textTheme: base.textTheme.apply(fontFamily: 'Tajawal'),
+      // glyphs Tajawal lacks (ﷺ) come from the bundled Naskh, not from the
+      // system or, on web, a font fetched from Google's servers
+      textTheme: base.textTheme.apply(
+        fontFamily: 'Tajawal',
+        fontFamilyFallback: const ['Noto Naskh Arabic'],
+      ),
     );
     final scheme = theme.colorScheme;
     return Theme(

@@ -174,7 +174,13 @@ class DesktopPrayer extends StatelessWidget {
                 children: [
                   CustomPaint(
                     size: const Size.square(260),
-                    painter: QiblaDialPainter(scheme),
+                    painter: QiblaDialPainter(
+                      scheme,
+                      fontFamily: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.fontFamily,
+                    ),
                   ),
                   Transform.rotate(
                     angle: bearing * pi / 180,
