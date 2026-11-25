@@ -60,12 +60,14 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (releaseStoreFile != null) {
-                signingConfigs.getByName("release")
-            } else {
-                // Debug fallback so `flutter run --release` works without a key;
-                // CI tag builds refuse to reach this.
-                signingConfigs.getByName("debug")
+            // Without a release key, fall back to debug signing so
+            // `flutter run --release` works; CI tag builds refuse to reach it.
+            // UNSIGNED_RELEASE=1 builds unsigned, for F-Droid: its build is
+            // compared with the release APK and given that APK's signature.
+            signingConfig = when {
+                System.getenv("UNSIGNED_RELEASE") == "1" -> null
+                releaseStoreFile != null -> signingConfigs.getByName("release")
+                else -> signingConfigs.getByName("debug")
             }
         }
     }
