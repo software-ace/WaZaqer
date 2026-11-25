@@ -234,12 +234,12 @@ List<SettingsSection> settingsSections(
         ListTile(title: const Text('الإصدار'), subtitle: Text(appVersion)),
         ListTile(
           title: const Text('الرخصة'),
-          subtitle: const Text('GPL-3.0، تطبيق حر ومفتوح المصدر'),
+          subtitle: const Text('GPL-3.0 أو أحدث، تطبيق حر ومفتوح المصدر'),
           onTap: () => showLicensePage(
             context: context,
             applicationName: 'وَذَكِر',
             applicationVersion: appVersion,
-            applicationLegalese: 'GPL-3.0',
+            applicationLegalese: 'GPL-3.0-or-later',
           ),
         ),
         ListTile(

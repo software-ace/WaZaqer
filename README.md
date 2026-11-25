@@ -114,7 +114,7 @@ Fastlane metadata lives in `fastlane/metadata/android/` (English and Arabic), re
 
 ## License
 
-GPL-3.0. See [LICENSE](LICENSE).
+GPL-3.0-or-later: the GNU General Public License, version 3 or (at your option) any later version. See [LICENSE](LICENSE).
 
 ## Content attribution
 
