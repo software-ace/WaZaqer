@@ -7,7 +7,7 @@
 [![Release](https://github.com/software-ace/WaZaqer/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/software-ace/WaZaqer/actions/workflows/release.yml)
 [![License: GPL-3.0](https://img.shields.io/github/license/software-ace/WaZaqer)](LICENSE)
 [![Flutter](https://img.shields.io/badge/Flutter-3.50.1-02569B?logo=flutter)](https://flutter.dev)
-[![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20Linux%20%7C%20Windows-0E7C5B)](#build)
+[![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20Linux%20%7C%20Windows%20%7C%20Web-0E7C5B)](#build)
 [![No ads, no trackers](https://img.shields.io/badge/ads%20%26%20trackers-none-0E7C5B)](#privacy)
 [![Sponsor](https://img.shields.io/github/sponsors/software-ace?logo=githubsponsors&label=Sponsor&color=EA4AAA)](https://github.com/sponsors/software-ace)
 
@@ -24,8 +24,44 @@ A free and open-source Flutter app for daily adhkar (remembrance): after prayer,
 - **Qibla**: a compass from the phone's magnetometer.
 - **Reminders**: per-group reminders (morning and evening timed from sunrise and sunset), salawat reminders across the day, and optional adhan notifications. All use the system sound.
 - **Settings**: accent colour, light/dark theme, Arabic or Latin digits, tashkeel on/off, six Arabic fonts and font size.
+- **Desktop layout** (Linux, Windows; windows 1200 px wide or more): categories, groups and the reader side by side, with keyboard shortcuts (Space counts, ← / → move, F hides the lists, Ctrl K searches). Prayer times and Qibla share one page.
+- **Web layout**: every page has its own address, down to a single dhikr; a group reads as one scrolling page with a count button per dhikr; prayer times use the browser's location.
 
 Arabic-first, right-to-left throughout.
+
+## Screenshots
+
+### Android
+
+<p align="center">
+  <img src=".github/screenshots/android-home.png" alt="Home: categories, favourites and the salawat card" width="32%">
+  <img src=".github/screenshots/android-reader.png" alt="Reader: one dhikr per page with the counter ring" width="32%">
+  <img src=".github/screenshots/android-tasbeeh.png" alt="Tasbeeh counter at 12 of 33" width="32%">
+</p>
+<p align="center">
+  <img src=".github/screenshots/android-prayer.png" alt="Prayer times for Riyadh with the next prayer highlighted" width="32%">
+  <img src=".github/screenshots/android-qibla.png" alt="Qibla compass pointing 244° from north" width="32%">
+  <img src=".github/screenshots/android-home-dark.png" alt="Home in the dark theme" width="32%">
+</p>
+
+### Desktop (Linux, Windows)
+
+<p align="center">
+  <img src=".github/screenshots/desktop-reader.png" alt="Desktop: categories, groups and the reader side by side" width="100%">
+</p>
+<p align="center">
+  <img src=".github/screenshots/desktop-prayer-dark.png" alt="Desktop, dark theme: prayer times beside the Qibla dial" width="100%">
+</p>
+
+### Web
+
+<p align="center">
+  <img src=".github/screenshots/web-home.png" alt="Web home: quick start, favourites and categories" width="100%">
+</p>
+<p align="center">
+  <img src=".github/screenshots/web-reader.png" alt="Web reader: every dhikr of a group on one scrolling page" width="70%">
+  <img src=".github/screenshots/web-phone-reader.png" alt="Web reader on a phone" width="24%">
+</p>
 
 ## Privacy
 
@@ -40,6 +76,8 @@ No ads, no analytics, no trackers, no accounts, and no `INTERNET` permission. Ev
 
 Location uses Android's own `LocationManager`, not Google Play Services, so the app builds without proprietary libraries.
 
+The web version loads nothing from other servers: it is built with `--no-web-resources-cdn`, so Flutter's renderer and fonts come from the site itself, and settings, favourites and progress stay in the browser's own storage. Location is asked through the browser's permission prompt.
+
 ## Build
 
 Requires the Flutter version pinned in `pubspec.yaml` (`environment: flutter`).
@@ -50,6 +88,7 @@ flutter test
 flutter build apk --release       # Android (minSdk 24)
 flutter build linux --release     # Linux desktop
 flutter build windows --release   # Windows desktop
+flutter build web --release --no-web-resources-cdn   # Web
 ```
 
 or run it directly with `flutter run`. Reminders work on Android only; the desktop builds have no background scheduler.
@@ -63,8 +102,9 @@ The **Release** workflow (`.github/workflows/release.yml`) runs analyze and test
 | Android | One APK per CPU type: `arm64-v8a` (most phones), `armeabi-v7a`, `x86_64` |
 | Linux | `.deb`, `.rpm`, AppImage (with `.zsync` for in-place updates), `.tar.gz` |
 | Windows | `setup.exe` (Inno Setup, per user or for everyone), `.msi` (per machine), `.zip` |
+| Web | Published to GitHub Pages: <https://software-ace.github.io/WaZaqer/> |
 
-Packaging lives in `linux/packaging/` (nfpm, AppImage script, desktop entry) and `windows/packaging/` (Inno Setup and WiX scripts). A push of a tag `vX.Y.Z` publishes a GitHub release; the tag must match `version:` in `pubspec.yaml`. A manual run of the workflow only uploads the builds as artifacts.
+Packaging lives in `linux/packaging/` (nfpm, AppImage script, desktop entry) and `windows/packaging/` (Inno Setup and WiX scripts). A push of a tag `vX.Y.Z` publishes a GitHub release and redeploys the web version; the tag must match `version:` in `pubspec.yaml`. A manual run of the workflow only uploads the builds as artifacts.
 
 Release APKs are signed with one key, from `android/key.properties` locally (gitignored) or from the `ANDROID_KEYSTORE_*` / `ANDROID_KEY_*` repository secrets in CI. Tag builds refuse to fall back to the debug key.
 
