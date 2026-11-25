@@ -1,4 +1,8 @@
+import 'dart:io' show Platform;
+
 import 'package:material_ui/material_ui.dart';
+
+import 'desktop/desktop_shell.dart';
 
 import 'home.dart';
 import 'prayer_page.dart';
@@ -7,15 +11,32 @@ import 'settings.dart';
 import 'store.dart';
 import 'tasbeeh.dart';
 
-/// Bottom-nav shell with the five tabs. Active item gets the M3 pill.
-class AppShell extends StatefulWidget {
+/// Picks the layout: a wide desktop window gets the desktop shell, a narrow
+/// one the mobile shell. Phones and tablets always get mobile, even wide in
+/// landscape: they have the compass and haptics the desktop layout leaves
+/// out. The web build has its own layout (lib/web/) and never comes here.
+class AppShell extends StatelessWidget {
   const AppShell({super.key});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) =>
+        !(Platform.isAndroid || Platform.isIOS) &&
+            box.maxWidth >= desktopMinWidth
+        ? const DesktopShell()
+        : const _MobileShell(),
+  );
 }
 
-class _AppShellState extends State<AppShell> {
+/// Bottom-nav shell with the five tabs. Active item gets the M3 pill.
+class _MobileShell extends StatefulWidget {
+  const _MobileShell();
+
+  @override
+  State<_MobileShell> createState() => _MobileShellState();
+}
+
+class _MobileShellState extends State<_MobileShell> {
   int _index = 0;
 
   static const _tabs = [
