@@ -48,6 +48,7 @@ dependencies:
   material_ui: ^1.11.1
   go_router: ^18.1.4
   web: ^1.1.2
+  workmanager: ^0.10.10
 dev_dependencies:
   flutter_test:
     sdk: flutter

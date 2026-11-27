@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:workmanager/workmanager.dart';
 
 import 'adhkar.dart';
 import 'digits.dart';
@@ -16,6 +17,22 @@ import 'store.dart';
 
 // Morning/evening adhkar are timed from sunrise/sunset; ids from adhkar.json.
 const morningId = 'g1', eveningId = 'g2';
+
+const _refreshTask = 'reminder-refresh';
+
+/// WorkManager runs this about once a day in a background isolate, so the
+/// window of reminder alarms keeps rolling forward while the app stays
+/// closed. Top level and kept by the compiler: the native side calls it by
+/// name.
+@pragma('vm:entry-point')
+void reminderRefreshDispatcher() {
+  Workmanager().executeTask((task, _) async {
+    await Store.init();
+    await Reminders._initPlugin();
+    await Reminders.reschedule();
+    return true;
+  });
+}
 
 /// Per-group reminder, stored as JSON under `rem:<groupId>`.
 class GroupReminder {
@@ -95,21 +112,26 @@ abstract final class Reminders {
   static bool get supported => !kIsWeb && Platform.isAndroid;
   static Future<void> _queue = Future.value();
 
-  // shortcut: one-off alarms for the next 7 days, refreshed on every app
-  // start and settings change; a user who doesn't open the app for a week
-  // stops getting reminders. Upgrade to a daily background job if that bites.
+  // One-off alarms for the next 7 days (sunrise and sunset move daily, so
+  // they can't simply repeat), refreshed on app start, on settings changes
+  // and once a day in the background by [reminderRefreshDispatcher].
   static const _days = 7;
+
+  static Future<void> _initPlugin({void Function(String groupId)? onOpen}) =>
+      _plugin.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('ic_notification'),
+        ),
+        onDidReceiveNotificationResponse: onOpen == null
+            ? null
+            : (r) {
+                if (r.payload?.isNotEmpty ?? false) onOpen(r.payload!);
+              },
+      );
 
   static Future<void> init(void Function(String groupId) onOpen) async {
     if (!supported) return;
-    await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_notification'),
-      ),
-      onDidReceiveNotificationResponse: (r) {
-        if (r.payload?.isNotEmpty ?? false) onOpen(r.payload!);
-      },
-    );
+    await _initPlugin(onOpen: onOpen);
     final launch = await _plugin.getNotificationAppLaunchDetails();
     final payload = launch?.notificationResponse?.payload;
     if ((launch?.didNotificationLaunchApp ?? false) &&
@@ -118,6 +140,15 @@ abstract final class Reminders {
       onOpen(payload);
     }
     await reschedule();
+    // keep: every app start calls this; replacing the task would restart
+    // its 24-hour clock each time
+    await Workmanager().initialize(reminderRefreshDispatcher);
+    await Workmanager().registerPeriodicTask(
+      _refreshTask,
+      _refreshTask,
+      frequency: const Duration(hours: 24),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+    );
   }
 
   /// Asks for the notification permission (Android 13+); true if granted.
