@@ -7,8 +7,7 @@ WebSite: https://software-ace.github.io/WaZaqer/
 SourceCode: https://github.com/software-ace/WaZaqer
 IssueTracker: https://github.com/software-ace/WaZaqer/issues
 Changelog: https://github.com/software-ace/WaZaqer/releases
-Donate:
-  - https://github.com/sponsors/software-ace
+Donate: https://github.com/sponsors/software-ace
 
 AutoName: WaZaqer
 
@@ -23,12 +22,14 @@ Builds:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
     output: build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-    binary: https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-armeabi-v7a.apk
+    binary: 
+      https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-armeabi-v7a.apk
     srclibs:
       - flutter@stable
     prebuild:
       - export flutterVersion=$(sed -n -E 's/^ +flutter[:] +([0-9.]+)$/\1/p' pubspec.yaml)
-      - git -C $$flutter$$ checkout -f $flutterVersion
+      - git -C $$flutter$$ checkout -f stable
+      - git -C $$flutter$$ reset --hard $flutterVersion
       - cd ..
       - mv ace.software.wazaqer /home/runner/work/WaZaqer/WaZaqer
       - pushd /home/runner/work/WaZaqer/WaZaqer
@@ -57,12 +58,14 @@ Builds:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
     output: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-    binary: https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-arm64-v8a.apk
+    binary: 
+      https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-arm64-v8a.apk
     srclibs:
       - flutter@stable
     prebuild:
       - export flutterVersion=$(sed -n -E 's/^ +flutter[:] +([0-9.]+)$/\1/p' pubspec.yaml)
-      - git -C $$flutter$$ checkout -f $flutterVersion
+      - git -C $$flutter$$ checkout -f stable
+      - git -C $$flutter$$ reset --hard $flutterVersion
       - cd ..
       - mv ace.software.wazaqer /home/runner/work/WaZaqer/WaZaqer
       - pushd /home/runner/work/WaZaqer/WaZaqer
@@ -91,12 +94,14 @@ Builds:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
     output: build/app/outputs/flutter-apk/app-x86_64-release.apk
-    binary: https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-x86_64.apk
+    binary: 
+      https://github.com/software-ace/WaZaqer/releases/download/v%v/WaZaqer-v%v-x86_64.apk
     srclibs:
       - flutter@stable
     prebuild:
       - export flutterVersion=$(sed -n -E 's/^ +flutter[:] +([0-9.]+)$/\1/p' pubspec.yaml)
-      - git -C $$flutter$$ checkout -f $flutterVersion
+      - git -C $$flutter$$ checkout -f stable
+      - git -C $$flutter$$ reset --hard $flutterVersion
       - cd ..
       - mv ace.software.wazaqer /home/runner/work/WaZaqer/WaZaqer
       - pushd /home/runner/work/WaZaqer/WaZaqer
