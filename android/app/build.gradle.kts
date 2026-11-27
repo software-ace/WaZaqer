@@ -26,6 +26,14 @@ android {
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
+    // No "Dependency metadata" block in the APK signing block: it lists the
+    // dependencies encrypted with a key only Google holds, so F-Droid's
+    // scanner rejects it. Same as in PocketSense.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
