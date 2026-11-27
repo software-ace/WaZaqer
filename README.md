@@ -73,6 +73,7 @@ No ads, no analytics, no trackers, no accounts, and no `INTERNET` permission. Ev
 | Coarse location | Prayer times and qibla (asked for only when you choose "use my location"; you can pick a city instead) |
 | Run at startup | Restore scheduled reminders after a reboot |
 | Vibration | Vibrating reminders |
+| Wake lock, foreground service, network state | Android's WorkManager, which runs the daily reminder refresh while the app is closed; it reads the network state only to decide when to run, and the app still has no `INTERNET` permission |
 
 Location uses Android's own `LocationManager`, not Google Play Services, so the app builds without proprietary libraries.
 
