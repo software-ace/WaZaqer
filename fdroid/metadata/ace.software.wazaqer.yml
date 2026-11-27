@@ -18,7 +18,7 @@ Repo: https://github.com/software-ace/WaZaqer.git
 Builds:
   - versionName: 1.0.0
     versionCode: 11
-    commit: d6c0b3c40022938323d3579095c56e304e979a7e
+    commit: ffdb04ddc3c6cfbc760e4d9ae5b9be9e49f22508
     sudo:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
@@ -52,7 +52,7 @@ Builds:
 
   - versionName: 1.0.0
     versionCode: 12
-    commit: d6c0b3c40022938323d3579095c56e304e979a7e
+    commit: ffdb04ddc3c6cfbc760e4d9ae5b9be9e49f22508
     sudo:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
@@ -86,7 +86,7 @@ Builds:
 
   - versionName: 1.0.0
     versionCode: 13
-    commit: d6c0b3c40022938323d3579095c56e304e979a7e
+    commit: ffdb04ddc3c6cfbc760e4d9ae5b9be9e49f22508
     sudo:
       - mkdir -p /home/runner/work/WaZaqer
       - chown -R vagrant /home/runner
