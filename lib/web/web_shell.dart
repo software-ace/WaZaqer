@@ -17,10 +17,14 @@ const webWideMinWidth = 760.0;
 /// `/g/<group>?d=<dhikr number>`, `/tasbeeh`, `/prayer`.
 GoRouter buildWebRouter({String initialLocation = '/'}) => GoRouter(
   initialLocation: initialLocation,
+  // a new page must not take focus: typing in the search box navigates on
+  // every letter, and a page that grabbed focus would cut the box off from
+  // the keyboard after the first one
+  requestFocus: false,
   routes: [
     ShellRoute(
       builder: (context, state, child) =>
-          WebShell(location: state.uri.path, child: child),
+          WebShell(uri: state.uri, child: child),
       routes: [
         GoRoute(path: '/', builder: (_, _) => const WebHome()),
         GoRoute(
@@ -82,9 +86,10 @@ class AdhkarScope extends InheritedWidget {
 /// screens, search, settings), a bottom bar on narrow screens, and the
 /// settings drawer.
 class WebShell extends StatefulWidget {
-  const WebShell({super.key, required this.location, required this.child});
+  const WebShell({super.key, required this.uri, required this.child});
 
-  final String location;
+  /// The current address; its path picks the section, its `q` the search.
+  final Uri uri;
   final Widget child;
 
   @override
@@ -101,16 +106,37 @@ class _WebShellState extends State<WebShell> {
     AdhkarData.load().then((d) {
       if (mounted) setState(() => _data = d);
     });
+    _syncSearch(); // a shared /search link fills the box
   }
 
+  /// Queries sent by typing that the router hasn't echoed back yet.
+  final _sent = <String>[];
+
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // a /search address typed or shared fills the box
-    final q = GoRouterState.of(context).uri.queryParameters['q'];
-    if (widget.location == '/search' && q != null && q != _search.text) {
-      _search.text = q;
+  void didUpdateWidget(WebShell old) {
+    super.didUpdateWidget(old);
+    if (old.uri != widget.uri) _syncSearch();
+  }
+
+  /// The box follows the address when the address changed by itself (a
+  /// shared /search link, Back or Forward, or leaving search), not when it
+  /// is just echoing what was typed: rewriting the box mid-typing would move
+  /// the cursor to the start and scramble the letters.
+  void _syncSearch() {
+    final q = widget.uri.path == '/search'
+        ? widget.uri.queryParameters['q'] ?? ''
+        : '';
+    final echo = _sent.indexOf(q);
+    if (echo >= 0) {
+      _sent.removeRange(0, echo + 1);
+      return;
     }
+    if (q == _search.text) return;
+    _sent.clear();
+    _search.value = TextEditingValue(
+      text: q,
+      selection: TextSelection.collapsed(offset: q.length),
+    );
   }
 
   @override
@@ -120,7 +146,7 @@ class _WebShellState extends State<WebShell> {
   }
 
   /// 0 adhkar (home, lists, reader), 1 tasbeeh, 2 prayer.
-  int get _section => switch (widget.location) {
+  int get _section => switch (widget.uri.path) {
     '/tasbeeh' => 1,
     '/prayer' => 2,
     _ => 0,
@@ -129,11 +155,15 @@ class _WebShellState extends State<WebShell> {
   static const _paths = ['/', '/tasbeeh', '/prayer'];
 
   void _onSearch(String v) {
-    if (v.trim().isEmpty) return context.go('/');
+    if (v.trim().isEmpty) {
+      _sent.add('');
+      return context.go('/');
+    }
+    _sent.add(v);
     final to = Uri(path: '/search', queryParameters: {'q': v}).toString();
-    // already searching: replace the address, so Back doesn't step through
-    // every letter typed
-    if (widget.location == '/search') {
+    // already searching: swap the search page for the refined one, so Back
+    // leaves the search in one step instead of one per letter
+    if (widget.uri.path == '/search') {
       Router.neglect(context, () => context.go(to));
     } else {
       context.go(to);

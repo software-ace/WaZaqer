@@ -177,4 +177,34 @@ void main() {
       expect(reports, [false, true, true]);
     },
   );
+
+  testWidgets('the search box keeps focus while typing navigates', (
+    tester,
+  ) async {
+    await _web(tester);
+    await tester.tap(find.byType(TextField));
+    await tester.pump();
+    // the first letter moves from home to the search page; check focus
+    // before typing again (enterText itself would re-focus the box)
+    await tester.enterText(find.byType(TextField), 'ا');
+    await tester.pumpAndSettle();
+    final box = tester.state<EditableTextState>(find.byType(EditableText));
+    expect(find.text('نتائج البحث عن «ا»'), findsOneWidget);
+    expect(box.widget.focusNode.hasFocus, isTrue);
+    await tester.enterText(find.byType(TextField), 'ال');
+    await tester.pumpAndSettle();
+    expect(box.widget.controller.text, 'ال');
+    expect(box.widget.controller.selection.baseOffset, 2); // cursor at the end
+  });
+
+  testWidgets('opening a search result clears the box', (tester) async {
+    await _web(tester, at: '/search?q=الصباح', ready: 'البحث');
+    await tester.tap(find.text('أذكار الصباح'));
+    await tester.pumpAndSettle();
+    expect(find.text('تم ٠ من ٣١'), findsOneWidget); // on the reader
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+  });
 }
